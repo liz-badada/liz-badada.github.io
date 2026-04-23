@@ -10,6 +10,39 @@ Notes on **LLM inference**, **training**, **RL**, **agents**, **multimodal**, an
 
 ---
 
+## At a glance
+
+```mermaid
+mindmap
+  root((AI Infra))
+    Inference
+      Engines
+      KV Cache
+      Attention & Kernels
+      Scheduling
+      Quantization
+    Parallelism & Comm
+      Parallelism
+      Ultra-scale
+      Comm & Networking
+      MoE
+      Long Context
+    Training & RL
+      Pretraining & SFT
+      Post-training
+      Agentic RL
+    Applications
+      Agents & RAG
+      Multimodal & Omni
+      Diffusion & Gen Media
+    Foundations
+      Hardware
+      Perf Modeling
+      Benchmarks
+```
+
+---
+
 ## Browse by area
 
 <div class="cluster-grid" markdown>
