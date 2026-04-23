@@ -29,6 +29,13 @@
   margin: 1.5rem 0;
 }
 
+/* Force exactly 3 columns on wider screens so 6 cards land as 2×3. */
+@media (min-width: 900px) {
+  .cluster-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 .cluster-card {
   display: block;
   padding: 1.1rem 1.3rem;
