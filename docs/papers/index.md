@@ -5,11 +5,19 @@ hide:
 
 # Papers
 
-Dated reading notes. Use the sidebar (Archive / Categories) or the [tag page](../tags.md) to filter. Each note carries frontmatter: `arxiv`, `venue`, `tags`, `tier (L1–L5)`, `status`, `related`.
+Dated reading notes. Each note carries frontmatter: `arxiv`, `venue`, `tags`, `categories`, `tier (L1–L5)`, `status`.
 
-## Browse by category
+## Recent notes
 
-Each paper note is filed under one of the 19 topic categories. The Material **Categories** archive (right sidebar) lists them all; a shortcut map:
+| Date | Title | Category | Tags | Tier |
+|---|---|---|---|---|
+| 2026-04-20 | [AFD Challenges for Modern MoE Models and Hardware](posts/2026-04-20-afd-challenges.md) | `parallelism` | afd · moe · roofline | L4 |
+| 2026-04-09 | [Theoretically Optimal Attention/FFN Ratios in Disaggregated LLM Serving](posts/2026-04-09-afd-optimal-ratio.md) | `parallelism` | afd · perf-modeling | L4 |
+| 2026-04-09 | [Frontier: Simulating the Next Generation of LLM Inference Systems](posts/2026-04-09-frontier-simulator.md) | `perf-modeling` | simulation · moe · disagg | L3 |
+
+> Full archive (paginated, auto-sorted by date) is in the **Archive** link in the right sidebar. **Categories** (also in the sidebar) filters by the 19 topic categories.
+
+## The 19 categories
 
 | Cluster | Categories |
 |---|---|
