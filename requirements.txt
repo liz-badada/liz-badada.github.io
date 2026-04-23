@@ -1,0 +1,3 @@
+mkdocs-material>=9.5
+mkdocs-material[imaging]
+pymdown-extensions>=10.7

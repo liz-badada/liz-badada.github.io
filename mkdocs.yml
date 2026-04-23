@@ -1,0 +1,138 @@
+site_name: AI Infra KB
+site_description: Personal knowledge base on LLM inference, training infra, RL, agents, multimodal, and GPU systems
+site_url: https://<your-github-username>.github.io/
+repo_url: https://github.com/<your-github-username>/<your-github-username>.github.io
+repo_name: kb
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: green
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: green
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - tags
+  - blog:
+      blog_dir: papers
+      post_dir: "{blog}/posts"
+      post_date_format: medium
+      post_url_date_format: yyyy/MM/dd
+      post_url_format: "{date}/{slug}"
+      archive: true
+      archive_name: Archive
+      categories: true
+      categories_name: Categories
+      pagination_per_page: 10
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+not_in_nav: |
+  /projects/*.md
+  !/projects/index.md
+
+nav:
+  - Home: index.md
+  - Roadmap: roadmap.md
+  - Papers:
+      - papers/index.md
+  - Inference:
+      - Inference Engines: engines/index.md
+      - KV Cache & Memory: kv-cache/index.md
+      - Attention & Kernels: attention/index.md
+      - Scheduling & Batching: scheduling/index.md
+      - Quantization & Compression: quantization/index.md
+  - Parallelism & Comm:
+      - Parallelism: parallelism/index.md
+      - Ultra-scale Training: large-scale/index.md
+      - Communication & Networking: communication/index.md
+      - MoE Systems: moe/index.md
+      - Long Context: long-context/index.md
+  - Training & RL:
+      - Pretraining & SFT: training/index.md
+      - Post-training (RLHF/DPO/GRPO): post-training/index.md
+      - Agentic RL: agentic-rl/index.md
+  - Applications:
+      - Agents & RAG: agents/index.md
+      - Multimodal & Omni: multimodal/index.md
+      - Diffusion & Gen Media: diffusion/index.md
+  - Foundations:
+      - Hardware & Systems: hardware/index.md
+      - Perf Modeling & Simulation: perf-modeling/index.md
+      - Benchmarks & Evaluation: benchmarks/index.md
+  - Projects: projects/index.md
+  - Reading List: reading-list.md
+  - Tags: tags.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/<your-github-username>
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/<your-handle>
