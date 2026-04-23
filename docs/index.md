@@ -1,35 +1,73 @@
 ---
 hide:
   - navigation
+  - toc
 ---
 
-# AI Infra Knowledge Base
+# AI Infra Notes
 
-Personal notes on **LLM inference**, **training infrastructure**, and **GPU systems** — built while reading papers and open-source projects.
+Notes on **LLM inference**, **training**, **RL**, **agents**, **multimodal**, and **GPU systems** — built while reading papers and open-source projects.
 
-> Focus: performance-first. If a paper or project doesn't change how I'd build or tune an inference / training system, it probably isn't worth a full note.
+---
 
-## How this site is organized
+## Browse by area
 
-| Layer | Purpose |
-|---|---|
-| **[Roadmap](roadmap.md)** | The AI Infra mental map — what connects to what |
-| **[Papers](papers/index.md)** | Dated reading notes, auto-archived by month |
-| **Topics** (8 categories) | Durable knowledge, grouped by subsystem |
-| **[Projects](projects/index.md)** | Deep dives on open-source codebases (vLLM, SGLang, …) |
-| **[Benchmarks](benchmarks/index.md)** | Eval setups, reproducible numbers |
-| **[Reading List](reading-list.md)** | Queue of things worth reading next |
+<div class="grid cards" markdown>
 
-## Reading tiers
+- :material-speedometer: **Inference**
 
-Each note is tagged `L1`–`L5`:
+    The runtime path: engines, KV cache, kernels, scheduling, quantization.
 
-- **L1** — aware it exists
-- **L2** — abstract + intro + conclusion
-- **L3** — full read + key experiments understood
-- **L4** — can reproduce key figures / numbers
-- **L5** — deeply internalized, applied to own work
+    [Inference Engines](engines/index.md) ·
+    [KV Cache & Memory](kv-cache/index.md) ·
+    [Attention & Kernels](attention/index.md) ·
+    [Scheduling & Batching](scheduling/index.md) ·
+    [Quantization](quantization/index.md)
 
-## Latest
+- :material-source-branch: **Parallelism & Communication**
 
-See [recent papers →](papers/index.md).
+    How compute gets split and how devices talk.
+
+    [Parallelism](parallelism/index.md) ·
+    [Ultra-scale Training](large-scale/index.md) ·
+    [Communication & Networking](communication/index.md) ·
+    [MoE Systems](moe/index.md) ·
+    [Long Context](long-context/index.md)
+
+- :material-school: **Training & RL**
+
+    Pretraining, post-training, and RL on agents.
+
+    [Pretraining & SFT](training/index.md) ·
+    [Post-training (RLHF/DPO/GRPO)](post-training/index.md) ·
+    [Agentic RL](agentic-rl/index.md)
+
+- :material-puzzle: **Applications**
+
+    Where infra gets used.
+
+    [Agents & RAG](agents/index.md) ·
+    [Multimodal & Omni](multimodal/index.md) ·
+    [Diffusion & Gen Media](diffusion/index.md)
+
+- :material-chip: **Foundations**
+
+    Silicon, modeling, and measurement.
+
+    [Hardware & Systems](hardware/index.md) ·
+    [Perf Modeling & Simulation](perf-modeling/index.md) ·
+    [Benchmarks & Evaluation](benchmarks/index.md)
+
+- :material-notebook: **Latest notes**
+
+    Dated reading notes and project deep-dives.
+
+    [All papers →](papers/index.md) ·
+    [All projects →](projects/index.md) ·
+    [Browse by tag →](tags.md)
+
+</div>
+
+---
+
+See [the full roadmap →](roadmap.md) for a single-page map of how these areas connect.

@@ -1,8 +1,9 @@
-site_name: AI Infra KB
-site_description: Personal knowledge base on LLM inference, training infra, RL, agents, multimodal, and GPU systems
-site_url: https://<your-github-username>.github.io/
-repo_url: https://github.com/<your-github-username>/<your-github-username>.github.io
-repo_name: kb
+site_name: AI Infra Notes
+site_description: Notes on LLM inference, training, RL, agents, multimodal, and GPU systems — from papers and open-source projects.
+site_author: liz-badada
+site_url: https://liz-badada.github.io/
+repo_url: https://github.com/liz-badada/liz-badada.github.io
+repo_name: liz-badada/liz-badada.github.io
 
 theme:
   name: material
@@ -96,6 +97,7 @@ extra_javascript:
 not_in_nav: |
   /projects/*.md
   !/projects/index.md
+  /reading-list.md
 
 nav:
   - Home: index.md
@@ -127,12 +129,9 @@ nav:
       - Perf Modeling & Simulation: perf-modeling/index.md
       - Benchmarks & Evaluation: benchmarks/index.md
   - Projects: projects/index.md
-  - Reading List: reading-list.md
   - Tags: tags.md
 
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/<your-github-username>
-    - icon: fontawesome/brands/linkedin
-      link: https://www.linkedin.com/in/<your-handle>
+      link: https://github.com/liz-badada
