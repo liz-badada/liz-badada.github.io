@@ -1,0 +1,113 @@
+/* ==========================================================================
+   5-Cluster color palette (cool → warm → neutral progression)
+   ========================================================================== */
+
+:root {
+  --c-inference:    #5C6BC0;  /* Indigo 400 */
+  --c-parallelism:  #42A5F5;  /* Blue 400 */
+  --c-training:     #26A69A;  /* Teal 400 */
+  --c-applications: #FFA726;  /* Orange 400 */
+  --c-foundations:  #78909C;  /* Blue Grey 400 */
+}
+
+[data-md-color-scheme="slate"] {
+  --c-inference:    #7986CB;  /* Indigo 300 */
+  --c-parallelism:  #64B5F6;  /* Blue 300 */
+  --c-training:     #4DB6AC;  /* Teal 300 */
+  --c-applications: #FFB74D;  /* Orange 300 */
+  --c-foundations:  #90A4AE;  /* Blue Grey 300 */
+}
+
+/* ==========================================================================
+   Homepage cluster cards
+   ========================================================================== */
+
+.cluster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.cluster-card {
+  display: block;
+  padding: 1.1rem 1.3rem;
+  border-left: 4px solid var(--c, var(--md-primary-fg-color));
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--c, #888) 4%, transparent);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cluster-card:hover {
+  background: color-mix(in srgb, var(--c, #888) 10%, transparent);
+  transform: translateY(-1px);
+}
+
+.cluster-card h3 {
+  margin: 0 0 0.3rem 0 !important;
+  color: var(--c) !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cluster-card .cluster-desc {
+  margin: 0 0 0.6rem 0;
+  opacity: 0.8;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cluster-card .cluster-links {
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.cluster-card .cluster-links a {
+  color: var(--c) !important;
+  text-decoration: none;
+}
+
+.cluster-card .cluster-links a:hover {
+  text-decoration: underline;
+}
+
+.cluster-inference    { --c: var(--c-inference); }
+.cluster-parallelism  { --c: var(--c-parallelism); }
+.cluster-training     { --c: var(--c-training); }
+.cluster-applications { --c: var(--c-applications); }
+.cluster-foundations  { --c: var(--c-foundations); }
+
+/* ==========================================================================
+   Per-topic page cluster accent (H1 left bar)
+   Applied via body class set by extra.js based on URL path.
+   ========================================================================== */
+
+body.in-inference    { --c: var(--c-inference); }
+body.in-parallelism  { --c: var(--c-parallelism); }
+body.in-training     { --c: var(--c-training); }
+body.in-applications { --c: var(--c-applications); }
+body.in-foundations  { --c: var(--c-foundations); }
+
+body[class*="in-"] .md-content h1:first-of-type {
+  border-left: 4px solid var(--c);
+  padding-left: 0.75rem;
+}
+
+body[class*="in-"] .md-content h1:first-of-type::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--c);
+  margin-right: 0.55rem;
+  vertical-align: middle;
+}
+
+/* Subtle tint on tables and quote blocks inside a cluster page */
+body[class*="in-"] .md-content blockquote {
+  border-left-color: var(--c) !important;
+}

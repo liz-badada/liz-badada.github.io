@@ -12,59 +12,71 @@ Notes on **LLM inference**, **training**, **RL**, **agents**, **multimodal**, an
 
 ## Browse by area
 
-<div class="grid cards" markdown>
+<div class="cluster-grid" markdown>
 
-- :material-speedometer: **Inference**
+<div class="cluster-card cluster-inference" markdown>
+### :material-speedometer: Inference
+<p class="cluster-desc">The runtime path: engines, KV cache, kernels, scheduling, quantization.</p>
+<div class="cluster-links" markdown>
+[Engines](engines/index.md) ·
+[KV Cache](kv-cache/index.md) ·
+[Attention](attention/index.md) ·
+[Scheduling](scheduling/index.md) ·
+[Quantization](quantization/index.md)
+</div>
+</div>
 
-    The runtime path: engines, KV cache, kernels, scheduling, quantization.
+<div class="cluster-card cluster-parallelism" markdown>
+### :material-source-branch: Parallelism & Communication
+<p class="cluster-desc">How compute gets split and how devices talk.</p>
+<div class="cluster-links" markdown>
+[Parallelism](parallelism/index.md) ·
+[Ultra-scale](large-scale/index.md) ·
+[Comm & Networking](communication/index.md) ·
+[MoE](moe/index.md) ·
+[Long Context](long-context/index.md)
+</div>
+</div>
 
-    [Inference Engines](engines/index.md) ·
-    [KV Cache & Memory](kv-cache/index.md) ·
-    [Attention & Kernels](attention/index.md) ·
-    [Scheduling & Batching](scheduling/index.md) ·
-    [Quantization](quantization/index.md)
+<div class="cluster-card cluster-training" markdown>
+### :material-school: Training & RL
+<p class="cluster-desc">Pretraining, post-training, and RL on agents.</p>
+<div class="cluster-links" markdown>
+[Pretraining & SFT](training/index.md) ·
+[Post-training](post-training/index.md) ·
+[Agentic RL](agentic-rl/index.md)
+</div>
+</div>
 
-- :material-source-branch: **Parallelism & Communication**
+<div class="cluster-card cluster-applications" markdown>
+### :material-puzzle: Applications
+<p class="cluster-desc">Where infra gets used.</p>
+<div class="cluster-links" markdown>
+[Agents & RAG](agents/index.md) ·
+[Multimodal & Omni](multimodal/index.md) ·
+[Diffusion & Gen Media](diffusion/index.md)
+</div>
+</div>
 
-    How compute gets split and how devices talk.
+<div class="cluster-card cluster-foundations" markdown>
+### :material-chip: Foundations
+<p class="cluster-desc">Silicon, modeling, and measurement.</p>
+<div class="cluster-links" markdown>
+[Hardware](hardware/index.md) ·
+[Perf Modeling](perf-modeling/index.md) ·
+[Benchmarks](benchmarks/index.md)
+</div>
+</div>
 
-    [Parallelism](parallelism/index.md) ·
-    [Ultra-scale Training](large-scale/index.md) ·
-    [Communication & Networking](communication/index.md) ·
-    [MoE Systems](moe/index.md) ·
-    [Long Context](long-context/index.md)
-
-- :material-school: **Training & RL**
-
-    Pretraining, post-training, and RL on agents.
-
-    [Pretraining & SFT](training/index.md) ·
-    [Post-training (RLHF/DPO/GRPO)](post-training/index.md) ·
-    [Agentic RL](agentic-rl/index.md)
-
-- :material-puzzle: **Applications**
-
-    Where infra gets used.
-
-    [Agents & RAG](agents/index.md) ·
-    [Multimodal & Omni](multimodal/index.md) ·
-    [Diffusion & Gen Media](diffusion/index.md)
-
-- :material-chip: **Foundations**
-
-    Silicon, modeling, and measurement.
-
-    [Hardware & Systems](hardware/index.md) ·
-    [Perf Modeling & Simulation](perf-modeling/index.md) ·
-    [Benchmarks & Evaluation](benchmarks/index.md)
-
-- :material-notebook: **Latest notes**
-
-    Dated reading notes and project deep-dives.
-
-    [All papers →](papers/index.md) ·
-    [All projects →](projects/index.md) ·
-    [Browse by tag →](tags.md)
+<div class="cluster-card" style="--c: var(--md-default-fg-color--lighter);" markdown>
+### :material-notebook: Latest
+<p class="cluster-desc">Dated reading notes and project deep-dives.</p>
+<div class="cluster-links" markdown>
+[All papers →](papers/index.md) ·
+[All projects →](projects/index.md) ·
+[Browse tags →](tags.md)
+</div>
+</div>
 
 </div>
 
