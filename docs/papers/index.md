@@ -11,7 +11,6 @@ Dated reading notes. Each note carries frontmatter: `arxiv`, `venue`, `tags`, `c
 
 | Date | Title | Category | Tags | Tier |
 |---|---|---|---|---|
-| 2026-04-23 | [DeepEP v2 (EPv2 + Engram/PP/CP + NCCL GIN)](posts/2026-04-23-deepep-v2.md) | `moe` | deepep · moe · nccl · gin · engram · jit | L3 |
 | 2026-04-23 | [GPU-Initiated Networking for NCCL (NCCL GIN)](posts/2026-04-23-nccl-gin.md) | `communication` | nccl · gin · rdma · moe · deepep | L3 |
 | 2026-04-20 | [AFD Challenges for Modern MoE Models and Hardware](posts/2026-04-20-afd-challenges.md) | `parallelism` | afd · moe · roofline | L4 |
 | 2026-04-09 | [Theoretically Optimal Attention/FFN Ratios in Disaggregated LLM Serving](posts/2026-04-09-afd-optimal-ratio.md) | `parallelism` | afd · perf-modeling | L4 |

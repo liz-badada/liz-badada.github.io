@@ -16,7 +16,7 @@ Deep dives on open-source codebases. Not every project deserves one — I write 
 | TensorRT-LLM | engines | *todo* | — |
 | AIConfigurator | perf-modeling | [note](aiconfigurator.md) | 2026-04-16 |
 | FlashInfer | attention | *todo* | — |
-| DeepEP | communication | *todo* | — |
+| DeepEP | moe / communication | [note](deepep.md) | 2026-04-23 |
 | FlashMLA | attention | *todo* | — |
 | verl | agentic-rl | *todo* | — |
 | Mooncake | kv-cache | *todo* | — |

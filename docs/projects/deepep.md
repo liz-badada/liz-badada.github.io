@@ -1,22 +1,19 @@
 ---
+title: DeepEP v2
 date: 2026-04-23
+repo: "https://github.com/deepseek-ai/DeepEP"
+org: "DeepSeek-AI"
+tags: [deepep, moe, ep, nccl, gin, engram, pp, cp, jit, elasticbuffer]
 categories:
   - moe
-tags: [deepep, moe, ep, nccl, gin, engram, pp, cp, jit, elasticbuffer]
-arxiv: ""
-venue: "github"
 tier: L3
-status: read
-links:
-  project: "https://github.com/deepseek-ai/DeepEP/pull/605"
+status: active
 ---
-
-<!-- more -->
 
 # DeepEP v2：EPv2 + Engram/PP/CP + NCCL GIN 后端
 
 > DeepSeek-AI · PR [#605](https://github.com/deepseek-ai/DeepEP/pull/605) "Introducing EPv2: faster EP, and Engram/PP/CP supports" · 分支 `epv2-release` · 2026-04
-> 关联阅读：[GPU-Initiated Networking for NCCL (NCCL GIN)](2026-04-23-nccl-gin.md)
+> 关联阅读：[GPU-Initiated Networking for NCCL (NCCL GIN)](../papers/posts/2026-04-23-nccl-gin.md)
 
 ---
 
@@ -337,4 +334,4 @@ Paper 里是 DeepEP v1 的集成数据，描述了 "每 comm 4 context → 多�
 | Barrier | `deep_ep/include/deep_ep/impls/barrier.cuh` + `common/comm.cuh` |
 | v1 兼容 | `csrc/kernels/legacy/` + `deep_ep/buffers/legacy.py` |
 
-相关笔记：[通信与网络 →](../../communication/index.md) · [MoE Systems →](../../moe/index.md)
+相关笔记：[通信与网络 →](../communication/index.md) · [MoE Systems →](../moe/index.md) · [NCCL GIN paper →](../papers/posts/2026-04-23-nccl-gin.md)
