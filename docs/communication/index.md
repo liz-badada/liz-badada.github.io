@@ -20,7 +20,7 @@ The glue between parallelism and hardware. Often what separates 40% MFU from 60%
 - **NCCL Device API (2.28+)** — device-callable primitives: LSA (NVLink/PCIe), Multimem (NVLink SHARP), **GIN** (RDMA over IB/RoCE). See [note → GPU-Initiated Networking for NCCL](../papers/posts/2026-04-23-nccl-gin.md).
 - **MSCCL / MSCCL++** — synthesized collectives, GPU-initiated comm.
 - **NVSHMEM / IBGDA** — OpenSHMEM-style device-initiated RDMA (standalone runtime, PGAS).
-- **DeepEP** — DeepSeek's EP-optimized all-to-all (originally NVSHMEM/IBGDA; NCCL GIN backend validated).
+- **DeepEP** — DeepSeek's EP-optimized all-to-all. v2 switches the RDMA backend to NCCL GIN (header-only, via NCCL ≥ 2.30.4). See [note → DeepEP v2](../papers/posts/2026-04-23-deepep-v2.md).
 - **NIXL** — NVIDIA open-source comm library for inference (KV transfer).
 
 ### Interconnect

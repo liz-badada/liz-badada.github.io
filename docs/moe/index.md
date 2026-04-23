@@ -23,7 +23,7 @@ Mixture-of-Experts. Sparse activation is easy on paper, painful on silicon.
 
 ### Expert parallelism (EP)
 - All-to-all dispatch / combine — usually the bottleneck.
-- **DeepEP** — FP8 / NVLink-aware all-to-all.
+- **DeepEP** — FP8 / NVLink-aware all-to-all. v2 rewrite unifies HT/LL into `ElasticBuffer`, switches RDMA backend to NCCL GIN, scales to EP 2048. See [note → DeepEP v2](../papers/posts/2026-04-23-deepep-v2.md).
 - EP + TP + DP mixing.
 
 ### MoE inference
