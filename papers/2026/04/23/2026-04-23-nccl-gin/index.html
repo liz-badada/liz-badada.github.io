@@ -2149,7 +2149,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              6 min read
+                              7 min read
                             
                           </span>
                         </div>
@@ -2283,26 +2283,39 @@
 </tr>
 </tbody>
 </table>
+<p><img alt="Device API 三模式与底层互联" src="../../../../../assets/papers/nccl-gin/NCCL_device_API.png" /></p>
 <p>与传统 host-initiated NCCL 的关键区别：<strong>Device API 操作的是 "collective symmetric memory window"</strong>，而传统 NCCL 在 regular memory 上跑 pipeline 原语（Simple / LL / LL128）。</p>
+<p><img alt="Device API（左）vs 传统 host-initiated NCCL（右）" src="../../../../../assets/papers/nccl-gin/gin_high_level.png" /></p>
 <hr />
 <h2 id="3-gin">3. GIN 三层架构<a class="headerlink" href="#3-gin" title="Permanent link">&para;</a></h2>
-<p><img alt="3-layer design" src="" /></p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌──────────────────────────────────────────────┐
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  Application (PyTorch / TRT-LLM / vLLM /    │
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   SGLang / DeepEP)                           │
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├──────────────────────────────────────────────┤
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  ① NCCL Core (host-side)                    │
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│    ncclCommWindowRegister, context init     │
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├──────────────────────────────────────────────┤
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  ② Device GIN API (GPU-callable)            │
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│    put / putValue / signal / flush /        │
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│    readSignal / waitSignal / counter / ...  │
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├──────────────────────────────────────────────┤
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  ③ GIN Network Plugin (dual semantics)      │
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│    ├─ GDAKI  (DOCA GPUNetIO, GPU→NIC)       │
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│    └─ Proxy  (GPU→CPU queue→NIC)            │
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└──────────────────────────────────────────────┘
-</span></code></pre></div>
+<p><img alt="NCCL GIN 三层架构：NCCL Core → Device GIN API → GinNet Plugin（GDAKI / Proxy 双后端）；右侧灰色路径为原有 two-sided collectives" src="../../../../../assets/papers/nccl-gin/GIN_arch.png" /></p>
+<p>对应到调用栈：</p>
+<pre class="mermaid"><code>flowchart TB
+    App["Application&lt;br/&gt;PyTorch · TRT-LLM · vLLM · SGLang · DeepEP"]
+
+    subgraph Core["① NCCL Core (host)"]
+        Core1["ncclCommWindowRegister"]
+        Core2["Device Communicator init"]
+        Core3["GIN context 创建"]
+    end
+
+    subgraph DevAPI["② Device GIN API (GPU-callable)"]
+        DevAPI1["put / putValue / signal"]
+        DevAPI2["flush / readCounter / waitCounter"]
+        DevAPI3["readSignal / waitSignal"]
+        DevAPI4["ncclGinBarrierSession"]
+    end
+
+    subgraph Plugin["③ GIN Network Plugin (dual semantics)"]
+        direction LR
+        GDAKI["&lt;b&gt;GDAKI&lt;/b&gt;&lt;br/&gt;DOCA GPUNetIO&lt;br/&gt;GPU → NIC 直连"]
+        Proxy["&lt;b&gt;Proxy&lt;/b&gt;&lt;br/&gt;GPU → CPU lock-free queue → NIC&lt;br/&gt;verbs via iput/test"]
+    end
+
+    App --&gt; Core
+    App -.kernel 内调用.-&gt; DevAPI
+    Core --&gt; DevAPI
+    DevAPI --&gt; Plugin</code></pre>
 <h3 id="31-1-nccl-core-host">3.1 ① NCCL Core — host 侧<a class="headerlink" href="#31-1-nccl-core-host" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>ncclCommWindowRegister</code>：集合注册 memory window，返回含所有 peer remote key 的 handle</li>
@@ -2411,25 +2424,25 @@
 <p>运行时通过 capability probe 自动选择，<code>NCCL_GIN_BACKEND</code> 可强制覆盖。</p>
 <hr />
 <h2 id="4-api">4. 设备端 API 示例：环形交换<a class="headerlink" href="#4-api" title="Permanent link">&para;</a></h2>
-<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">__global__</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringExchange</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">ncclDevComm</span><span class="w"> </span><span class="n">devComm</span><span class="p">,</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">sendWin</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">recvWin</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">myRank</span><span class="p">)</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">{</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">ncclGin</span><span class="w"> </span><span class="nf">gin</span><span class="p">(</span><span class="n">devComm</span><span class="p">,</span><span class="w"> </span><span class="cm">/*contextIndex=*/</span><span class="mi">0</span><span class="p">);</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">myRank</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">devComm</span><span class="p">.</span><span class="n">nRanks</span><span class="p">;</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="c1">// put + 顺带把 peer 的 signal[0] 自增 1</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">ncclTeamWorld</span><span class="p">(</span><span class="n">devComm</span><span class="p">),</span><span class="w"> </span><span class="n">peer</span><span class="p">,</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">          </span><span class="n">recvWin</span><span class="p">,</span><span class="w"> </span><span class="n">myRank</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">          </span><span class="n">sendWin</span><span class="p">,</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">          </span><span class="n">ncclGin_SignalInc</span><span class="p">{</span><span class="mi">0</span><span class="p">});</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="c1">// 等前驱 rank 的 put 到达</span>
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">waitSignal</span><span class="p">(</span><span class="n">ncclCoopCta</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">resetSignal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">__global__</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringExchange</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">ncclDevComm</span><span class="w"> </span><span class="n">devComm</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">sendWin</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">recvWin</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">myRank</span><span class="p">)</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">{</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">  </span><span class="n">ncclGin</span><span class="w"> </span><span class="nf">gin</span><span class="p">(</span><span class="n">devComm</span><span class="p">,</span><span class="w"> </span><span class="cm">/*contextIndex=*/</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">myRank</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">devComm</span><span class="p">.</span><span class="n">nRanks</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="c1">// put + 顺带把 peer 的 signal[0] 自增 1</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">ncclTeamWorld</span><span class="p">(</span><span class="n">devComm</span><span class="p">),</span><span class="w"> </span><span class="n">peer</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">          </span><span class="n">recvWin</span><span class="p">,</span><span class="w"> </span><span class="n">myRank</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">          </span><span class="n">sendWin</span><span class="p">,</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">          </span><span class="n">ncclGin_SignalInc</span><span class="p">{</span><span class="mi">0</span><span class="p">});</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="c1">// 等前驱 rank 的 put 到达</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">waitSignal</span><span class="p">(</span><span class="n">ncclCoopCta</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">resetSignal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>关键点：</p>
 <ul>
@@ -2506,9 +2519,9 @@
 </table>
 <h3 id="53-trickmulti-communicator-mapping">5.3 关键 trick：multi-communicator mapping<a class="headerlink" href="#53-trickmulti-communicator-mapping" title="Permanent link">&para;</a></h3>
 <p>GIN 每 communicator 只有 4 个 context，而 DeepEP 要 24 QPs：</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>num_comms = ceil(QPs / 4)
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>comm_id   = qp_id / 4
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ctx_id    = qp_id % 4
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>num_comms = ceil(QPs / 4)
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>comm_id   = qp_id / 4
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>ctx_id    = qp_id % 4
 </span></code></pre></div>
 <p>通过多 communicator 补足 QP 并行度。</p>
 <h3 id="54-release-acquire">5.4 release-acquire 语义的实现<a class="headerlink" href="#54-release-acquire" title="Permanent link">&para;</a></h3>
