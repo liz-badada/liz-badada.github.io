@@ -12,11 +12,11 @@
         <meta name="author" content="liz-badada">
       
       
-        <link rel="canonical" href="https://liz-badada.github.io/papers/2026/04/09/2026-04-09-frontier-simulator/">
+        <link rel="canonical" href="https://liz-badada.github.io/papers/2026/04/23/2026-04-23-nccl-gin/">
       
       
+        <link rel="prev" href="../../20/2026-04-20-afd-challenges/">
       
-        <link rel="next" href="../2026-04-09-afd-optimal-ratio/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>2026 04 09 frontier simulator - AI Infra Notes</title>
+        <title>2026 04 23 nccl gin - AI Infra Notes</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#frontier-simulating-the-next-generation-of-llm-inference-systems" class="md-skip">
+        <a href="#gpu-initiated-networking-for-nccl-nccl-gin" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              2026 04 09 frontier simulator
+              2026 04 23 nccl gin
             
           </span>
         </div>
@@ -1756,19 +1756,41 @@
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 问题动机
+        1. 核心问题
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="1. 问题动机">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-nccl-228-device-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. NCCL 2.28 Device API 全景
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-gin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. GIN 三层架构
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. GIN 三层架构">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#11-intra-node" class="md-nav__link">
+  <a href="#31-1-nccl-core-host" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1.1 Intra-node 建模精度不足
+        3.1 ① NCCL Core — host 侧
       
     </span>
   </a>
@@ -1776,21 +1798,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#12-inter-node" class="md-nav__link">
+  <a href="#32-2-device-gin-api-gpu-kernel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1.2 Inter-node 编排能力缺失
+        3.2 ② Device GIN API — GPU kernel 内调用
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="3.2 ② Device GIN API — GPU kernel 内调用">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#13" class="md-nav__link">
+  <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1.3 系统级策略缺失
+        Context：网络并行的核心抽象
       
     </span>
   </a>
@@ -1801,7 +1824,34 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        成本背景
+        完成语义（非常重要）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ordering-unordered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ordering — 默认 unordered
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-3-gin-network-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 ③ GIN Network Plugin — 双语义
       
     </span>
   </a>
@@ -1814,22 +1864,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2" class="md-nav__link">
+  <a href="#4-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. 背景：推理架构范式
+        4. 设备端 API 示例：环形交换
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="2. 背景：推理架构范式">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-deepep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. DeepEP 集成：真实负载验证
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. DeepEP 集成：真实负载验证">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#21-pd-prefilldecode-disaggregation" class="md-nav__link">
+  <a href="#51" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.1 PD 分离（Prefill/Decode Disaggregation）
+        5.1 集成要求
       
     </span>
   </a>
@@ -1837,10 +1898,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#22-af-attentionffn-disaggregation" class="md-nav__link">
+  <a href="#52" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.2 AF 分离（Attention/FFN Disaggregation）
+        5.2 四大语义翻译挑战
       
     </span>
   </a>
@@ -1848,10 +1909,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#23-moe-expert-parallelism-ep" class="md-nav__link">
+  <a href="#53-trickmulti-communicator-mapping" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2.3 MoE + Expert Parallelism (EP)
+        5.3 关键 trick：multi-communicator mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#54-release-acquire" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.4 release-acquire 语义的实现
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#55-ht-kernel-batch-4096-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.5 HT kernel（大 batch, 4096 tokens）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#56-ll-kernel-batch-1128-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.6 LL kernel（小 batch, 1–128 tokens）
       
     </span>
   </a>
@@ -1864,22 +1958,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-frontier" class="md-nav__link">
+  <a href="#6-eos-h100-8400-gbps-ib" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Frontier 架构设计
+        6. 实验（EOS 集群，H100 + 8×400 Gbps IB）
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. Frontier 架构设计">
+    <nav class="md-nav" aria-label="6. 实验（EOS 集群，H100 + 8×400 Gbps IB）">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#31-stage-centric" class="md-nav__link">
+  <a href="#61-microbenchping-pong-put-signal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.1 核心理念：Stage-Centric 设计
+        6.1 点对点 microbench（ping-pong put + signal）
       
     </span>
   </a>
@@ -1887,22 +1981,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#32-globalcontroller" class="md-nav__link">
+  <a href="#62-deepep-ht-kernelfp8bf16248" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.2 GlobalController（全局控制器）
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3.2 GlobalController（全局控制器）">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pd-pull-based-kv-cache" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        PD 模式下的 Pull-Based KV-Cache 传输
+        6.2 DeepEP HT kernel（FP8/BF16，2/4/8 节点）
       
     </span>
   </a>
@@ -1910,10 +1992,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#af" class="md-nav__link">
+  <a href="#63-deepep-ll-kernelbf16-hidden7168-14352b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AF 模式下的事件依赖图
+        6.3 DeepEP LL kernel（BF16, hidden=7168, 14352B 消息）
       
     </span>
   </a>
@@ -1922,144 +2004,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#33-clusterworker" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3.3 ClusterWorker（集群工作器）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#34-replicaworker-executionpredictor" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3.4 ReplicaWorker &amp; ExecutionPredictor
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. 算子建模
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="4. 算子建模">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#41-attention" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.1 Attention 算子
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#42-groupedgemm-moe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.2 GroupedGEMM 算子（MoE 核心）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#43" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4.3 训练方法论
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-moe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. MoE 推理仿真
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="5. MoE 推理仿真">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#51-token-to-expert-straggler" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.1 Token-to-Expert 路由与 Straggler 建模
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#52-expert-parallelism" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.2 Expert Parallelism 约束
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#53" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.3 负载不均衡处理
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-table-1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. 功能对比（Table 1）
-      
-    </span>
-  </a>
   
 </li>
       
@@ -2067,19 +2011,30 @@
   <a href="#7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. 实验评估
+        7. 相对既有工作的差异
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="7. 实验评估">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 我的评估
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. 我的评估">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#71" class="md-nav__link">
+  <a href="#81" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.1 实验配置
+        8.1 关键价值
       
     </span>
   </a>
@@ -2087,10 +2042,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#72" class="md-nav__link">
+  <a href="#82" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.2 算子级精度
+        8.2 现阶段限制（作者自己承认）
       
     </span>
   </a>
@@ -2098,10 +2053,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#73-pd-11-prefilldecode" class="md-nav__link">
+  <a href="#83" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.3 端到端验证（PD 分离，1:1 Prefill:Decode 比）
+        8.3 对我的工作的启示
       
     </span>
   </a>
@@ -2109,10 +2064,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#74" class="md-nav__link">
+  <a href="#84" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7.4 结果分析
+        8.4 有待观察
       
     </span>
   </a>
@@ -2125,21 +2080,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. 局限性
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#9" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. 结论与未来工作
+        9. 参考
       
     </span>
   </a>
@@ -2183,7 +2127,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-09 00:00:00+00:00" class="md-ellipsis">Apr 9, 2026</time>
+                        <time datetime="2026-04-23 00:00:00+00:00" class="md-ellipsis">Apr 23, 2026</time>
                       </div>
                     </li>
                     
@@ -2194,7 +2138,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/perf-modeling/">perf-modeling</a></span>
+                              <a href="../../../../category/communication/">communication</a></span>
                         </div>
                       </li>
                     
@@ -2205,7 +2149,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              4 min read
+                              6 min read
                             
                           </span>
                         </div>
@@ -2233,7 +2177,28 @@
       
       
       
-        <span class="md-tag">disaggregation</span>
+        <span class="md-tag">deepep</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">device-api</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gin</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ibgda</span>
       
     
       
@@ -2247,14 +2212,21 @@
       
       
       
-        <span class="md-tag">perf-modeling</span>
+        <span class="md-tag">nccl</span>
       
     
       
       
       
       
-        <span class="md-tag">simulation</span>
+        <span class="md-tag">nvshmem</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rdma</span>
       
     
   </nav>
@@ -2266,327 +2238,446 @@
 
 <!-- more -->
 
-<h1 id="frontier-simulating-the-next-generation-of-llm-inference-systems">Frontier: Simulating the Next Generation of LLM Inference Systems<a class="headerlink" href="#frontier-simulating-the-next-generation-of-llm-inference-systems" title="Permanent link">&para;</a></h1>
+<h1 id="gpu-initiated-networking-for-nccl-nccl-gin">GPU-Initiated Networking for NCCL (NCCL GIN)<a class="headerlink" href="#gpu-initiated-networking-for-nccl-nccl-gin" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>arXiv:2508.03148<br />
-Yicheng Feng, Xin Tan, Kin Hang Sew, Yimin Jiang, Yibo Zhu, Hong Xu</p>
+<p>arXiv:2511.15076v2 · NVIDIA, 2025
+关键词：NCCL 2.28 Device API · GIN · DOCA GPUNetIO · one-sided RDMA · DeepEP</p>
 </blockquote>
 <hr />
-<h2 id="1">1. 问题动机<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<p>现代 LLM 推理正从单体密集模型转向 <strong>MoE + 分离式架构</strong>，现有仿真器（Vidur、LLMServingSim）设计于同址 (co-located) 密集模型时代，存在三大根本缺陷：</p>
-<h3 id="11-intra-node">1.1 Intra-node 建模精度不足<a class="headerlink" href="#11-intra-node" title="Permanent link">&para;</a></h3>
+<h2 id="1">1. 核心问题<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>现代 AI 负载（尤其是 <strong>MoE 推理</strong> 与 <strong>编译器生成的融合 kernel</strong>）需要从 GPU kernel 内部直接发起、细粒度、低延迟的 GPU↔GPU 通信。传统 NCCL 走 <strong>host-initiated</strong> 模型——CPU 编排所有通信、每次调用都是独立 kernel launch——对大规模集合通信很稳健，但对：</p>
 <ul>
-<li>Vidur 的 Attention 模型使用<strong>单一代理长度（通常为序列长度的平方根）</strong>简化建模</li>
-<li>在序列长度倾斜的 batch 上，Vidur 的 FlashAttention 预测<strong>误差超过 55%</strong>（预测 0.151ms vs 实测 0.340ms）</li>
-<li>未支持 MoE 核心算子 <strong>GroupedGEMM</strong></li>
+<li><strong>MoE 动态 token routing</strong>（DeepSeek-V3 风格）</li>
+<li><strong>JAX/Triton 的 comm-compute fusion</strong></li>
+<li><strong>推理 decode 阶段的点对点小消息</strong></li>
 </ul>
-<h3 id="12-inter-node">1.2 Inter-node 编排能力缺失<a class="headerlink" href="#12-inter-node" title="Permanent link">&para;</a></h3>
-<ul>
-<li>旧仿真器采用 <strong>replica-centric 抽象</strong>：每个 replica 为同构、自包含的模型副本</li>
-<li>无法表达分离式架构中的：跨集群路由、KV-Cache 传输、复杂同步原语</li>
-<li>"推理不再是单体任务，而是跨专用异构集群编排的多阶段 workflow"</li>
-</ul>
-<h3 id="13">1.3 系统级策略缺失<a class="headerlink" href="#13" title="Permanent link">&para;</a></h3>
-<ul>
-<li>真实推理引擎（vLLM, SGLang, TensorRT-LLM）实现了多样的 batching、调度、内存管理策略</li>
-<li>现有仿真器将这些关键行为因子抽象掉</li>
-</ul>
-<h3 id="_1">成本背景<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
-<p>优化 72B 模型在 16 GPU 上的配置需经验搜索约 <strong>18,000 GPU-hours（成本超 $93,000）</strong>，凸显仿真驱动探索的必要性。</p>
+<p>则引入了不必要的 CPU 协调与 host-device 同步开销。</p>
+<p>NVSHMEM 已经证明了 <strong>device-initiated</strong> 通信（IBGDA）的价值，但它是独立 runtime，与 NCCL 生态脱节，用户要么放弃 NCCL 的 topology-aware 集合与生产级基础设施，要么放弃 device-initiated 的低延迟。</p>
+<p><strong>本文贡献</strong>：在 NCCL 2.28 的 Device API 中引入 <strong>GIN（GPU-Initiated Networking）</strong>，把 device-initiated 一边 RDMA 语义纳入 NCCL 统一 runtime，保留 NCCL 的 hierarchical communicator、容错、弹性扩缩等生产特性。</p>
 <hr />
-<h2 id="2">2. 背景：推理架构范式<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
-<h3 id="21-pd-prefilldecode-disaggregation">2.1 PD 分离（Prefill/Decode Disaggregation）<a class="headerlink" href="#21-pd-prefilldecode-disaggregation" title="Permanent link">&para;</a></h3>
-<p>将 <strong>计算密集的 Prefill</strong> 和 <strong>内存带宽受限的 Decode</strong> 阶段分配到独立专用集群，利用两阶段截然不同的计算特征优化资源分配。</p>
-<h3 id="22-af-attentionffn-disaggregation">2.2 AF 分离（Attention/FFN Disaggregation）<a class="headerlink" href="#22-af-attentionffn-disaggregation" title="Permanent link">&para;</a></h3>
-<p>更细粒度的拆分：Attention 计算和 FFN 运算跨集群部署，支持更精细的异构扩展。</p>
-<h3 id="23-moe-expert-parallelism-ep">2.3 MoE + Expert Parallelism (EP)<a class="headerlink" href="#23-moe-expert-parallelism-ep" title="Permanent link">&para;</a></h3>
+<h2 id="2-nccl-228-device-api">2. NCCL 2.28 Device API 全景<a class="headerlink" href="#2-nccl-228-device-api" title="Permanent link">&para;</a></h2>
+<p>Device API 提供三种 device-side 通信模式，对应三类硬件：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>硬件</th>
+<th>典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LSA</strong>（Load/Store Accessible）</td>
+<td>NVLink / PCIe（节点内）</td>
+<td>节点内对等 GPU load/store</td>
+</tr>
+<tr>
+<td><strong>Multimem</strong></td>
+<td>NVLink SHARP</td>
+<td>硬件 multicast / reduce</td>
+</tr>
+<tr>
+<td><strong>GIN</strong>（本文重点）</td>
+<td>InfiniBand / RoCE（跨节点）</td>
+<td>跨节点 one-sided RDMA</td>
+</tr>
+</tbody>
+</table>
+<p>与传统 host-initiated NCCL 的关键区别：<strong>Device API 操作的是 "collective symmetric memory window"</strong>，而传统 NCCL 在 regular memory 上跑 pipeline 原语（Simple / LL / LL128）。</p>
+<hr />
+<h2 id="3-gin">3. GIN 三层架构<a class="headerlink" href="#3-gin" title="Permanent link">&para;</a></h2>
+<p><img alt="3-layer design" src="" /></p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌──────────────────────────────────────────────┐
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  Application (PyTorch / TRT-LLM / vLLM /    │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   SGLang / DeepEP)                           │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>├──────────────────────────────────────────────┤
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  ① NCCL Core (host-side)                    │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│    ncclCommWindowRegister, context init     │
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>├──────────────────────────────────────────────┤
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  ② Device GIN API (GPU-callable)            │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│    put / putValue / signal / flush /        │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│    readSignal / waitSignal / counter / ...  │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>├──────────────────────────────────────────────┤
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  ③ GIN Network Plugin (dual semantics)      │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│    ├─ GDAKI  (DOCA GPUNetIO, GPU→NIC)       │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│    └─ Proxy  (GPU→CPU queue→NIC)            │
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└──────────────────────────────────────────────┘
+</span></code></pre></div>
+<h3 id="31-1-nccl-core-host">3.1 ① NCCL Core — host 侧<a class="headerlink" href="#31-1-nccl-core-host" title="Permanent link">&para;</a></h3>
 <ul>
-<li>MoE 用多个 "expert" FFN 替换密集 FFN，每个 token 仅路由到其中一个子集</li>
-<li>实现参数量大幅增长、计算量仅亚线性增长</li>
-<li>EP 将 expert 计算分布到专用集群</li>
+<li><code>ncclCommWindowRegister</code>：集合注册 memory window，返回含所有 peer remote key 的 handle</li>
+<li>资源分配、communicator 初始化、GIN context 创建</li>
+<li><strong>allocation 与 registration 解耦</strong>：可从已有 buffer 创建 window</li>
+<li>当前 NCCL 2.28 要求对称大小，未来将放开（对 disagg 的 prefill/decode 不同 buffer size 尤为重要）</li>
+</ul>
+<h3 id="32-2-device-gin-api-gpu-kernel">3.2 ② Device GIN API — GPU kernel 内调用<a class="headerlink" href="#32-2-device-gin-api-gpu-kernel" title="Permanent link">&para;</a></h3>
+<p>四类操作：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>操作</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data movement</strong></td>
+<td><code>put</code> / <code>putValue</code> / <code>signal</code></td>
+<td>单边写、小值 inline 写、远端通知</td>
+</tr>
+<tr>
+<td><strong>Local completion</strong></td>
+<td><code>flush</code> / <code>readCounter</code> / <code>waitCounter</code></td>
+<td>本地源 buffer 可复用</td>
+</tr>
+<tr>
+<td><strong>Remote completion</strong></td>
+<td><code>readSignal</code> / <code>waitSignal</code></td>
+<td>远端数据已可见</td>
+</tr>
+<tr>
+<td><strong>Barrier / state</strong></td>
+<td><code>ncclGinBarrierSession</code> / <code>reset*</code></td>
+<td>跨 rank 同步、重置</td>
+</tr>
+</tbody>
+</table>
+<h4 id="context">Context：网络并行的核心抽象<a class="headerlink" href="#context" title="Permanent link">&para;</a></h4>
+<ul>
+<li>每个 context 封装一条 GPU↔NIC 通道（QP + connection）</li>
+<li><strong>单 communicator 多 context</strong>：可同时利用多 NIC、多 port、多 QP</li>
+<li>一个 context 可寻址 communicator 内所有 rank，并发发向不同 peer</li>
+</ul>
+<h4 id="_1">完成语义（非常重要）<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Counter</strong>：本地、per-op、按用户提供的 <code>counterID</code> 计数 → 适合 pipeline 算法</li>
+<li><strong>Signal</strong>：远端、<strong>ID 寻址</strong>（不是 OpenSHMEM 的 address 寻址）→ 硬件实现更高效</li>
+<li><strong>Flush</strong> ≠ Counter：flush 只保证 context 内<strong>本地</strong>全部完成（源 buffer 可复用），不保证远端可见</li>
+</ul>
+<h4 id="ordering-unordered">Ordering — 默认 unordered<a class="headerlink" href="#ordering-unordered" title="Permanent link">&para;</a></h4>
+<ul>
+<li>仅保证同 context、同 peer 的 <code>put</code> 与后续 <code>signal</code> 之间的顺序</li>
+<li>用法：批量 put 后最后一个带 signal，实现 <strong>release-acquire</strong> 语义</li>
+<li>线程间顺序用户用 CUDA 原语自己管（<code>__syncwarp</code> 等）</li>
+</ul>
+<h3 id="33-3-gin-network-plugin">3.3 ③ GIN Network Plugin — 双语义<a class="headerlink" href="#33-3-gin-network-plugin" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th><strong>GDAKI</strong></th>
+<th><strong>Proxy</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>通信路径</td>
+<td>GPU ↔ NIC（直连）</td>
+<td>GPU → CPU → NIC</td>
+</tr>
+<tr>
+<td>CPU 参与</td>
+<td>无</td>
+<td>每 communicator 一个 pinned 线程</td>
+</tr>
+<tr>
+<td>发起方式</td>
+<td>GPU 直接写 NIC doorbell</td>
+<td>GPU 写 64B descriptor → CPU lock-free queue → CPU 发 verbs</td>
+</tr>
+<tr>
+<td>硬件要求</td>
+<td><strong>ConnectX-6 Dx+、CUDA 12.2+</strong></td>
+<td>任何 RDMA NIC（IB/RoCE/iWARP），任何 CUDA</td>
+</tr>
+<tr>
+<td>设备 API 所有权</td>
+<td>Plugin 提供 device code</td>
+<td>NCCL Core 提供 device code，plugin 只实现 <code>iput</code>/<code>iput_signal</code>/<code>test</code>/<code>regMr</code></td>
+</tr>
+<tr>
+<td>调试</td>
+<td>只能 device-side</td>
+<td>host-side trace 友好</td>
+</tr>
+<tr>
+<td>典型场景</td>
+<td>生产 HPC/AI 集群</td>
+<td>开发、legacy、多厂商 fabric</td>
+</tr>
+</tbody>
+</table>
+<p>运行时通过 capability probe 自动选择，<code>NCCL_GIN_BACKEND</code> 可强制覆盖。</p>
+<hr />
+<h2 id="4-api">4. 设备端 API 示例：环形交换<a class="headerlink" href="#4-api" title="Permanent link">&para;</a></h2>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">__global__</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringExchange</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">ncclDevComm</span><span class="w"> </span><span class="n">devComm</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">sendWin</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">recvWin</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">myRank</span><span class="p">)</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">{</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">ncclGin</span><span class="w"> </span><span class="nf">gin</span><span class="p">(</span><span class="n">devComm</span><span class="p">,</span><span class="w"> </span><span class="cm">/*contextIndex=*/</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">myRank</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">devComm</span><span class="p">.</span><span class="n">nRanks</span><span class="p">;</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="c1">// put + 顺带把 peer 的 signal[0] 自增 1</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="n">ncclTeamWorld</span><span class="p">(</span><span class="n">devComm</span><span class="p">),</span><span class="w"> </span><span class="n">peer</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">          </span><span class="n">recvWin</span><span class="p">,</span><span class="w"> </span><span class="n">myRank</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">          </span><span class="n">sendWin</span><span class="p">,</span><span class="w"> </span><span class="n">peer</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span><span class="w"> </span><span class="n">dataSize</span><span class="p">,</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">          </span><span class="n">ncclGin_SignalInc</span><span class="p">{</span><span class="mi">0</span><span class="p">});</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="c1">// 等前驱 rank 的 put 到达</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">waitSignal</span><span class="p">(</span><span class="n">ncclCoopCta</span><span class="p">(),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">resetSignal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>关键点：</p>
+<ul>
+<li><strong>window + offset 寻址</strong>（不是指针）</li>
+<li><code>SignalInc</code> / <code>SignalAdd</code> 可附加在 put 上，省一次额外 round-trip</li>
+<li>协作级别通过 <code>ncclCoopCta()</code> / <code>ncclCoopThread()</code> / warp 变体选择</li>
 </ul>
 <hr />
-<h2 id="3-frontier">3. Frontier 架构设计<a class="headerlink" href="#3-frontier" title="Permanent link">&para;</a></h2>
-<h3 id="31-stage-centric">3.1 核心理念：Stage-Centric 设计<a class="headerlink" href="#31-stage-centric" title="Permanent link">&para;</a></h3>
-<p><strong>从 "管理同构 replica 池" 转变为 "编排请求在分布式系统中的流转"。</strong></p>
-<p>三层层级架构：</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>GlobalController
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ├── ClusterWorker (Prefill / Decode / Attention / FFN)
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  │     ├── ClusterScheduler
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  │     └── ReplicaWorker Pool
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  │           └── ExecutionPredictor
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  └── ClusterWorker ...
+<h2 id="5-deepep">5. DeepEP 集成：真实负载验证<a class="headerlink" href="#5-deepep" title="Permanent link">&para;</a></h2>
+<p>DeepEP = DeepSeek 的 MoE 专用通信库，原生用 NVSHMEM + IBGDA。本文把 GIN 作为后端接入，<strong>与原 NVSHMEM 路径共存</strong>（用户按环境选择）。</p>
+<h3 id="51">5.1 集成要求<a class="headerlink" href="#51" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>需求</th>
+<th>数量 / 形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>QP 并行</td>
+<td>HT kernel 需 24 QPs；LL kernel 需 8–16 QPs（= 本地 expert 数）</td>
+</tr>
+<tr>
+<td>拓扑</td>
+<td>HT = 对称 rank-to-rank RDMA + NVLink forward；LL = 全互联 all-to-all</td>
+</tr>
+<tr>
+<td>同步</td>
+<td>原子更新 head/tail 指针（circular buffer 流控）</td>
+</tr>
+<tr>
+<td>后端共存</td>
+<td>IBGDA 与 GIN 运行时切换</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52">5.2 四大语义翻译挑战<a class="headerlink" href="#52" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>挑战</th>
+<th>NVSHMEM/IBGDA</th>
+<th>NCCL GIN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>地址模型</strong></td>
+<td>PGAS 指针 + symmetric heap</td>
+<td>window + offset</td>
+</tr>
+<tr>
+<td><strong>数据 API</strong></td>
+<td><code>put_nbi(dst_ptr, src_ptr, n, pe)</code> warp-collective</td>
+<td><code>put(team, peer, dstWin, dstOff, srcWin, srcOff, n)</code> thread</td>
+</tr>
+<tr>
+<td><strong>同步原语</strong></td>
+<td>远端 memory atomics（<code>atomic_add</code>）</td>
+<td>signal atomics（<code>signal(peer, id)</code> + <code>readSignal(id)</code>）</td>
+</tr>
+<tr>
+<td><strong>完成模型</strong></td>
+<td><code>quiet()</code> per-QP</td>
+<td><code>flush()</code> per-context（可并行完成检查）</td>
+</tr>
+<tr>
+<td><strong>Barrier</strong></td>
+<td><code>barrier(team)</code> 整团</td>
+<td><code>ncclGinBarrierSession</code> 带 session ID，可子集同步</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-trickmulti-communicator-mapping">5.3 关键 trick：multi-communicator mapping<a class="headerlink" href="#53-trickmulti-communicator-mapping" title="Permanent link">&para;</a></h3>
+<p>GIN 每 communicator 只有 4 个 context，而 DeepEP 要 24 QPs：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>num_comms = ceil(QPs / 4)
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>comm_id   = qp_id / 4
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>ctx_id    = qp_id % 4
 </span></code></pre></div>
-<h3 id="32-globalcontroller">3.2 GlobalController（全局控制器）<a class="headerlink" href="#32-globalcontroller" title="Permanent link">&para;</a></h3>
-<p><strong>职责</strong>：有状态编排器，管理跨分离系统的端到端请求生命周期。</p>
+<p>通过多 communicator 补足 QP 并行度。</p>
+<h3 id="54-release-acquire">5.4 release-acquire 语义的实现<a class="headerlink" href="#54-release-acquire" title="Permanent link">&para;</a></h3>
+<p>用 <strong>zero-byte put + SignalAdd</strong> 模拟：批量 put 后发一个 0 字节 put 带 SignalAdd，利用 GIN "同 context 同 peer put-before-signal 有序" 的保证，实现 release-acquire。这是整个集成里最优雅的一笔。</p>
+<h3 id="55-ht-kernel-batch-4096-tokens">5.5 HT kernel（大 batch, 4096 tokens）<a class="headerlink" href="#55-ht-kernel-batch-4096-tokens" title="Permanent link">&para;</a></h3>
 <ul>
-<li>协调独立 ClusterWorker 之间的事件</li>
-<li>管理跨阶段 workflow 和依赖关系</li>
-<li>实现 <strong>背压 (backpressure)</strong> 机制进行速率匹配</li>
-<li>维护请求状态机</li>
+<li><strong>SM 角色分化</strong>：奇数 SM = Sender + NVLink Receiver；偶数 SM = Forwarder（RDMA → NVLink 转发）</li>
+<li>head/tail 各走独立 channel（独立 communicator）避免竞争</li>
+<li>单线程 <code>put()</code> + <code>__syncwarp()</code> 复刻 warp-collective 语义</li>
+<li>协调 SM 负责 <code>flush</code> → barrier → reset signals → 元数据交换</li>
 </ul>
-<h4 id="pd-pull-based-kv-cache">PD 模式下的 Pull-Based KV-Cache 传输<a class="headerlink" href="#pd-pull-based-kv-cache" title="Permanent link">&para;</a></h4>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>请求到达
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  ↓
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>GlobalController 路由 → Prefill 集群
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  ↓
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Prefill 完成：请求状态 = PREFILL_COMPLETE
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>KV-Cache 保持在 prefill 内存缓冲区
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  ↓
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Decode 集群监控内存利用率
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>  ↓
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>Decode slot 释放（KV-Cache 驱逐）
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>Decode ClusterScheduler 发信号通知内存可用 → GlobalController
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>  ↓
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>GlobalController 出队 PREFILL_COMPLETE 请求
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>发起 KV_CACHE_TRANSFER 事件
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>  ↓
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>KV-Cache 传输到 Decode 集群
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>Decode 开始处理
-</span></code></pre></div>
-<p><strong>关键动态</strong>：
-- Decode GPU 有限内存为瓶颈资源
-- Prefill→Decode 输出速率受 Decode 内存可用性约束
-- 系统级背压防止内存溢出</p>
-<h4 id="af">AF 模式下的事件依赖图<a class="headerlink" href="#af" title="Permanent link">&para;</a></h4>
+<h3 id="56-ll-kernel-batch-1128-tokens">5.6 LL kernel（小 batch, 1–128 tokens）<a class="headerlink" href="#56-ll-kernel-batch-1128-tokens" title="Permanent link">&para;</a></h3>
+<ul>
+<li>全互联 RDMA mesh、per-expert signal</li>
+<li>SM 分配：<code>expert_idx = sm_id * G + warp_group_id</code>（<code>G = ceil(N_experts / N_SMs)</code>）</li>
+<li><strong>混合 NVLink-RDMA</strong>：先 <code>nccl_get_p2p_ptr</code> 判断是否同节点，能走 NVLink 就走</li>
+<li>FP8 量化在 host→RDMA 拷贝阶段内联做</li>
+<li>每个 destination 发送完后，由 counting warp 发 <code>zero-byte put + SignalAdd</code> 交付 token 计数</li>
+</ul>
+<hr />
+<h2 id="6-eos-h100-8400-gbps-ib">6. 实验（EOS 集群，H100 + 8×400 Gbps IB）<a class="headerlink" href="#6-eos-h100-8400-gbps-ib" title="Permanent link">&para;</a></h2>
+<h3 id="61-microbenchping-pong-put-signal">6.1 点对点 microbench（ping-pong put + signal）<a class="headerlink" href="#61-microbenchping-pong-put-signal" title="Permanent link">&para;</a></h3>
+<p>小消息（4–128 B）round-trip 延迟：</p>
+<table>
+<thead>
+<tr>
+<th>实现</th>
+<th>延迟 (μs)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVSHMEM IBRC</td>
+<td><strong>16.0</strong></td>
+</tr>
+<tr>
+<td><strong>NCCL GIN GDAKI</strong></td>
+<td><strong>16.7</strong></td>
+</tr>
+<tr>
+<td>NCCL GIN Proxy</td>
+<td>18.0</td>
+</tr>
+<tr>
+<td>NVSHMEM IBGDA</td>
+<td>24.3</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>GDAKI 与 NVSHMEM IBRC 同档，优于 NVSHMEM IBGDA</li>
+<li>Proxy 尽管走 GPU→CPU queue，仍只比 GDAKI 多 1.3μs</li>
+<li>大消息带宽受限，四者收敛</li>
+</ul>
+<h3 id="62-deepep-ht-kernelfp8bf16248">6.2 DeepEP HT kernel（FP8/BF16，2/4/8 节点）<a class="headerlink" href="#62-deepep-ht-kernelfp8bf16248" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>规模</th>
+<th>操作</th>
+<th>NCCL GIN RDMA BW</th>
+<th>NVSHMEM RDMA BW</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2 nodes (16 GPU, BF16)</td>
+<td>dispatch</td>
+<td>84.36 GB/s</td>
+<td>84.97 GB/s</td>
+</tr>
+<tr>
+<td>8 nodes (64 GPU)</td>
+<td>dispatch</td>
+<td>~53–54 GB/s</td>
+<td>~53–54 GB/s</td>
+</tr>
+</tbody>
+</table>
+<p><strong>全配置内两者差异 1–2%</strong>。</p>
+<h3 id="63-deepep-ll-kernelbf16-hidden7168-14352b">6.3 DeepEP LL kernel（BF16, hidden=7168, 14352B 消息）<a class="headerlink" href="#63-deepep-ll-kernelbf16-hidden7168-14352b" title="Permanent link">&para;</a></h3>
+<p><strong>NVLink enabled</strong>：</p>
+<ul>
+<li>1 node：GIN dispatch 185.28 GB/s / 40.62 μs；NVSHMEM 182.15 GB/s / 41.43 μs</li>
+<li>2 nodes：GIN 延迟 <strong>比 NVSHMEM 低 9%</strong>（142.51 vs 157.00 μs）</li>
+<li>combine 全规模 1–3% 内</li>
+</ul>
+<p><strong>NVLink disabled（pure RDMA）</strong>：</p>
+<ul>
+<li>1 node：47.00 GB/s / 160.82 μs（GIN）≈ 46.79 / 160.67（NVSHMEM）</li>
+<li>8 nodes：34–35 GB/s / 219–225 μs</li>
+</ul>
+<p><strong>结论</strong>：GIN 在 DeepEP 这种重度 device-initiated 负载上，性能已经追平甚至略超 NVSHMEM/IBGDA。</p>
+<hr />
+<h2 id="7">7. 相对既有工作的差异<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>既有方案</th>
+<th>短板</th>
+<th>GIN 如何解决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NVSHMEM</strong></td>
+<td>独立 runtime，脱离 NCCL 生态</td>
+<td>同语义、同能力，直接内建在 NCCL 2.28</td>
+</tr>
+<tr>
+<td><strong>GPUrdma / GIO</strong></td>
+<td>GPU-NIC memory consistency 难</td>
+<td>靠 DOCA GPUNetIO 的生产级设备 verbs + ID-based signal</td>
+</tr>
+<tr>
+<td><strong>GPUDirect Async（2016）</strong></td>
+<td>CPU 仍需预构描述符</td>
+<td>GPU 线程完全自主构造 WQE + 写 doorbell</td>
+</tr>
+<tr>
+<td><strong>DeepEP / pplx-kernels</strong></td>
+<td>独立库，无法复用 NCCL 集合、topology、容错</td>
+<td>GIN 是 NCCL 原生原语，可与集合混用</td>
+</tr>
+<tr>
+<td><strong>MSCCL / MSCCL++</strong></td>
+<td>聚焦 synthesized collective，device-initiated 点对点 RDMA 不是核心</td>
+<td>GIN 专注 device-initiated RDMA + 单边语义</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8">8. 我的评估<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<h3 id="81">8.1 关键价值<a class="headerlink" href="#81" title="Permanent link">&para;</a></h3>
 <ol>
-<li>GlobalController 发起 decode step</li>
-<li>Decode-Attention 阶段将全局 batch 划分为 m 个 micro-batch</li>
-<li>GlobalController 和 ClusterScheduler 动态构建跨 L 层所有操作的<strong>依赖图</strong></li>
-<li>事件驱动引擎按依赖满足顺序调度事件</li>
-<li>总 token 生成时间 = 最终事件完成的时间戳</li>
+<li><strong>生态统一</strong>：第一次把 device-initiated RDMA 以原生 plugin 形式接入 NCCL，意味着未来 TRT-LLM / vLLM / SGLang / PyTorch 里<strong>不必再挂 NVSHMEM</strong> 这第二套 runtime</li>
+<li><strong>双 backend 是务实设计</strong>：GDAKI 上限高但硬件门槛高（ConnectX-6 Dx+、CUDA 12.2+）；Proxy 兜底任何 RDMA NIC，部署生命周期更长</li>
+<li><strong>ID-based signal</strong>：相比 OpenSHMEM address-based 同步更简洁、硬件实现更友好，也给 NIC/DPU 设计留了空间</li>
+<li><strong>释放了 release-acquire via zero-byte put + SignalAdd 的模式</strong>：这在未来 MoE / disagg 通信里会被大量复用</li>
 </ol>
-<p><strong>Ping-Pong 流水线延迟隐藏</strong>：
-- A_TO_F_TRANSFER(i, k) 执行时，Attention GPU 空闲，可执行 ATTN_COMPUTE(i+1, k)
-- 最终延迟：Token_latency = timestamp(FFN_COMPUTE(m, L))（最后一个 micro-batch 的最后一层）</p>
-<h3 id="33-clusterworker">3.3 ClusterWorker（集群工作器）<a class="headerlink" href="#33-clusterworker" title="Permanent link">&para;</a></h3>
-<p>专用硬件集群的抽象（Prefill/Decode/Attention/FFN 集群）。</p>
-<p>内部组件：
-- <strong>ClusterScheduler</strong>：管理本地资源、参与跨阶段协调
-- <strong>ReplicaWorker Pool</strong>：个体模型实例集合</p>
-<p>调度职责：
-- 跟踪资源利用率（GPU 内存、计算容量）
-- 向 GlobalController 通信内存可用性
-- 管理 AF 流水线中的 micro-batch 交接
-- 执行本地调度策略（batching、内存管理）</p>
-<h3 id="34-replicaworker-executionpredictor">3.4 ReplicaWorker &amp; ExecutionPredictor<a class="headerlink" href="#34-replicaworker-executionpredictor" title="Permanent link">&para;</a></h3>
-<p><strong>ExecutionPredictor</strong> 是核心创新：将逻辑层分解为<strong>数据依赖的微 workflow 事件序列</strong>，而非将算子视为单体黑箱。</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>传统：Layer(inputs) → output
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Frontier：Event₁ → Event₂ → ... → Eventₙ（显式依赖、异构执行时间）
-</span></code></pre></div>
-<hr />
-<h2 id="4">4. 算子建模<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
-<h3 id="41-attention">4.1 Attention 算子<a class="headerlink" href="#41-attention" title="Permanent link">&para;</a></h3>
-<p><strong>问题</strong>：Vidur 用单一代理长度简化，忽略了 kernel tiling 下的输入异构性（wave quantization 现象）。</p>
-<p><strong>Frontier 方案</strong>：
-- <strong>模型类型</strong>：Random Forest 回归
-- <strong>输入特征</strong>：
-  - 序列长度的聚合统计（mean, min, max）
-  - 分布特征（variance, skew）
-  - Batch size
-  - 序列长度分布特性
-- <strong>训练数据</strong>：来自异构 batch 组合的执行 trace
-- <strong>精度</strong>：&gt;94% 的预测误差低于 10%（vs. Vidur 55% 误差）</p>
-<h3 id="42-groupedgemm-moe">4.2 GroupedGEMM 算子（MoE 核心）<a class="headerlink" href="#42-groupedgemm-moe" title="Permanent link">&para;</a></h3>
-<p>Vidur 完全不支持，是性能预测的"重大盲区"。</p>
-<p><strong>Frontier 方案</strong>：
-- <strong>输入特征</strong>：
-  - 每个 expert 的 token 计数
-  - Expert 数量
-  - 模型维度
-  - Expert 选择率
-  - 负载均衡指标（token 分布的 variance / coefficient of variation）
-- <strong>精度</strong>：&gt;95% 的预测误差低于 6%</p>
-<h3 id="43">4.3 训练方法论<a class="headerlink" href="#43" title="Permanent link">&para;</a></h3>
-<p>特征"反映输入属性和 expert 负载分布"，即使在高度可变的工作负载下也能实现"鲁棒且精确的预测"。</p>
-<hr />
-<h2 id="5-moe">5. MoE 推理仿真<a class="headerlink" href="#5-moe" title="Permanent link">&para;</a></h2>
-<h3 id="51-token-to-expert-straggler">5.1 Token-to-Expert 路由与 Straggler 建模<a class="headerlink" href="#51-token-to-expert-straggler" title="Permanent link">&para;</a></h3>
-<p>ExecutionPredictor 将 MoE 层拆解为显式微 workflow：</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>1. Router 门控计算 → GEMM for gating network
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>2. Token 分配 → 可插拔路由模块生成 token-to-expert 映射
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>3. Expert 计算（异构）→ 查询 GroupedGEMM 模型获取每个 expert 的执行时间
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>4. 同步屏障 → MoE_latency = max(T_expert₁, T_expert₂, ..., T_expertₙ)
-</span></code></pre></div>
-<p><strong>关键公式</strong>：</p>
-<div class="arithmatex">\[\text{MoE\_latency} = \max(T_{\text{expert}_1}, T_{\text{expert}_2}, \ldots, T_{\text{expert}_N})\]</div>
-<p>取所有 expert 执行时间的最大值，天然捕获了负载不均衡导致的 <strong>straggler 效应</strong>。</p>
-<h3 id="52-expert-parallelism">5.2 Expert Parallelism 约束<a class="headerlink" href="#52-expert-parallelism" title="Permanent link">&para;</a></h3>
-<p>虚拟模型分片遵循拓扑约束：</p>
-<div class="arithmatex">\[\text{attn\_dp} \times \text{attn\_tp} = \text{moe\_tp} \times \text{moe\_ep}\]</div>
-<p>（decode-attention 数据并行度 × 张量并行度 = MoE 张量并行度 × expert 并行度）</p>
-<h3 id="53">5.3 负载不均衡处理<a class="headerlink" href="#53" title="Permanent link">&para;</a></h3>
-<p>不预测平均 expert 时间，而是显式模拟"由 token 负载不均衡导致的最坏情况 straggler"，确保"不均衡效应以高保真度建模"。</p>
-<hr />
-<h2 id="6-table-1">6. 功能对比（Table 1）<a class="headerlink" href="#6-table-1" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>功能维度</th>
-<th style="text-align: center;">LLMServingSim</th>
-<th style="text-align: center;">Vidur</th>
-<th style="text-align: center;"><strong>Frontier</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>PD 分离</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>AF 分离</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>Pipeline Parallelism</td>
-<td style="text-align: center;">✓</td>
-<td style="text-align: center;">✓</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>Tensor Parallelism</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>Data Parallelism</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;">–</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>Expert Parallelism</td>
-<td style="text-align: center;">✗</td>
-<td style="text-align: center;">–</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-<tr>
-<td>Advanced Scheduling</td>
-<td style="text-align: center;">✓</td>
-<td style="text-align: center;">✓</td>
-<td style="text-align: center;"><strong>✓</strong></td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="7">7. 实验评估<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
-<h3 id="71">7.1 实验配置<a class="headerlink" href="#71" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>项目</th>
-<th>配置</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>硬件</td>
-<td>8-GPU node, NVIDIA A800-SXM4-80GB</td>
-</tr>
-<tr>
-<td>互联</td>
-<td>400 GB/s NVLink</td>
-</tr>
-<tr>
-<td>软件栈</td>
-<td>PyTorch 2.3, CUDA 12.1, Ray 2.42.1, FlashInfer 0.1.6</td>
-</tr>
-<tr>
-<td>推理引擎</td>
-<td>vLLM 0.10.1 (SharedStorageConnector KV interface)</td>
-</tr>
-<tr>
-<td>测试模型</td>
-<td>Qwen2-7B-Instruct</td>
-</tr>
-</tbody>
-</table>
-<h3 id="72">7.2 算子级精度<a class="headerlink" href="#72" title="Permanent link">&para;</a></h3>
-<p><strong>Attention 算子（Figure 2）</strong>：
-- Frontier：&gt;94% 的 case 误差 &lt; 10%
-- Vidur：特定 case 误差超 55%（72 请求倾斜序列长度 batch：0.151ms vs 0.340ms）</p>
-<p><strong>GroupedGEMM 算子</strong>：
-- Vidur：不支持
-- Frontier：&gt;95% 的误差 &lt; 6%</p>
-<h3 id="73-pd-11-prefilldecode">7.3 端到端验证（PD 分离，1:1 Prefill:Decode 比）<a class="headerlink" href="#73-pd-11-prefilldecode" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th style="text-align: center;">Batch</th>
-<th style="text-align: center;">Avg Input</th>
-<th style="text-align: center;">Output</th>
-<th style="text-align: center;">Profiled (tok/s/GPU)</th>
-<th style="text-align: center;">Predicted (tok/s/GPU)</th>
-<th style="text-align: center;">相对误差</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: center;">4</td>
-<td style="text-align: center;">32</td>
-<td style="text-align: center;">1024</td>
-<td style="text-align: center;">111.355</td>
-<td style="text-align: center;">90.498</td>
-<td style="text-align: center;">~18.7%</td>
-</tr>
-<tr>
-<td style="text-align: center;">8</td>
-<td style="text-align: center;">128</td>
-<td style="text-align: center;">256</td>
-<td style="text-align: center;">131.831</td>
-<td style="text-align: center;">109.366</td>
-<td style="text-align: center;">~17.1%</td>
-</tr>
-<tr>
-<td style="text-align: center;">16</td>
-<td style="text-align: center;">256</td>
-<td style="text-align: center;">128</td>
-<td style="text-align: center;">151.425</td>
-<td style="text-align: center;">127.157</td>
-<td style="text-align: center;">~16.0%</td>
-</tr>
-<tr>
-<td style="text-align: center;">32</td>
-<td style="text-align: center;">32</td>
-<td style="text-align: center;">128</td>
-<td style="text-align: center;">313.236</td>
-<td style="text-align: center;">240.743</td>
-<td style="text-align: center;">~23.2%</td>
-</tr>
-</tbody>
-</table>
-<p><strong>整体端到端误差范围：19.0%–23.2%</strong></p>
-<h3 id="74">7.4 结果分析<a class="headerlink" href="#74" title="Permanent link">&para;</a></h3>
+<h3 id="82">8.2 现阶段限制（作者自己承认）<a class="headerlink" href="#82" title="Permanent link">&para;</a></h3>
 <ul>
-<li>算子级建模显著优于 Vidur，特别是在输入异构性高的场景</li>
-<li>端到端验证表明趋势预测准确，但仍存在 19–23% 的误差裕量</li>
-<li>误差来源：多阶段 pipeline 中各算子误差的累积与交互</li>
+<li>NCCL 2.28 窗口大小要求对称（disagg prefill/decode 异构 buffer 还没法原生表达）</li>
+<li>每 communicator 4 context 对 DeepEP 这种重度并行还是紧，要多开 communicator 拼</li>
+<li>GDAKI 的 WQE 还没 batch，一次 doorbell 一次操作；作者 roadmap 已列优化</li>
+<li>评测集中在 DeepEP，暂无 JAX/Triton/PyTorch distributed 的端到端数据</li>
+</ul>
+<h3 id="83">8.3 对我的工作的启示<a class="headerlink" href="#83" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>AFD / disagg serving</strong>：GIN 的 per-context flush、signal 远端同步非常契合 Attention↔FFN 的 per-layer 紧同步需求，比 NCCL send/recv + host launch 的老路径低延迟得多，值得跟进</li>
+<li><strong>NIXL / KV transfer</strong>：KV cache 跨实例传输天然是 one-sided 写 + 远端完成通知，GIN 直接可用；以后 NIXL 可能可以复用 GIN 作为 RDMA 后端</li>
+<li><strong>MoE 推理</strong>：若 DeepEP 未来官方支持 GIN backend，部署依赖会从 NVSHMEM 迁移到 NCCL，运维面大幅收敛</li>
+</ul>
+<h3 id="84">8.4 有待观察<a class="headerlink" href="#84" title="Permanent link">&para;</a></h3>
+<ul>
+<li>GDAKI 的 WQE batching / doorbell amortization 落地后，是否能在小消息把延迟压到 10μs 以下</li>
+<li>NCCL Symmetric memory window 放开非对称大小的节奏（disagg 真正需要）</li>
+<li>非 NVIDIA NIC 厂商（Broadcom / AWS EFA 等）是否会跟 Proxy plugin 语义对接</li>
 </ul>
 <hr />
-<h2 id="8">8. 局限性<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
-<ol>
-<li>端到端精度维持 19–23% 误差，尚未达到高保真</li>
-<li>评估仅限单一模型 (Qwen2-7B) 和单一硬件配置 (A800)</li>
-<li>AF 分离和 MoE EP 的端到端验证结果未展示（仅有算子级）</li>
-<li>缺少大规模系统设计 case study</li>
-</ol>
-<hr />
-<h2 id="9">9. 结论与未来工作<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
-<p><strong>核心贡献</strong>：从 "replica-centric" 到 <strong>"stage-centric"</strong> 的仿真架构范式转换，实现了对分布式多阶段推理 workflow 的原生建模。</p>
-<p>三大贡献对应三大挑战：
-1. <strong>Intra-node</strong>：ML-based 细粒度算子建模（Random Forest + 分布特征）
-2. <strong>Inter-node</strong>：GlobalController + 事件依赖图 + 背压机制
-3. <strong>系统策略</strong>：可插拔模块支持多种真实推理引擎策略</p>
-<p><strong>未来方向</strong>：
-- 扩展核心算子建模
-- 量化仿真保真度与计算成本
-- 大规模系统设计 case study
-- 开源发布</p>
+<h2 id="9">9. 参考<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<ul>
+<li>NCCL 2.28 Device API 官方文档</li>
+<li>DOCA GPUNetIO（GDAKI 底层）</li>
+<li>NVSHMEM / IBGDA 对比基线</li>
+<li>DeepEP（MoE 集成样板）</li>
+<li>MPI RMA window 模型（window 语义借鉴来源）</li>
+</ul>
+<p>相关笔记：<a href="../../../../../communication/">通信与网络 →</a></p>
 
 
 
@@ -2630,22 +2721,22 @@ Yicheng Feng, Xin Tan, Kin Hang Sew, Yimin Jiang, Yibo Zhu, Hong Xu</p>
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
-        
           
-          <a href="../2026-04-09-afd-optimal-ratio/" class="md-footer__link md-footer__link--next" aria-label="Next: 2026 04 09 afd optimal ratio">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                2026 04 09 afd optimal ratio
-              </div>
-            </div>
+          <a href="../../20/2026-04-20-afd-challenges/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2026 04 20 afd challenges">
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                2026 04 20 afd challenges
+              </div>
             </div>
           </a>
+        
         
       </nav>
     

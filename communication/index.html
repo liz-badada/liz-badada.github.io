@@ -717,6 +717,8 @@
       
         
       
+        
+      
     
     
     
@@ -761,6 +763,36 @@
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../papers/category/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -2005,8 +2037,10 @@
 <h3 id="libraries-algorithms">Libraries &amp; algorithms<a class="headerlink" href="#libraries-algorithms" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>NCCL</strong> — tree / ring / double-binary-tree.</li>
+<li><strong>NCCL Device API (2.28+)</strong> — device-callable primitives: LSA (NVLink/PCIe), Multimem (NVLink SHARP), <strong>GIN</strong> (RDMA over IB/RoCE). See <a href="../papers/2026/04/23/2026-04-23-nccl-gin/">note → GPU-Initiated Networking for NCCL</a>.</li>
 <li><strong>MSCCL / MSCCL++</strong> — synthesized collectives, GPU-initiated comm.</li>
-<li><strong>DeepEP</strong> — DeepSeek's EP-optimized all-to-all.</li>
+<li><strong>NVSHMEM / IBGDA</strong> — OpenSHMEM-style device-initiated RDMA (standalone runtime, PGAS).</li>
+<li><strong>DeepEP</strong> — DeepSeek's EP-optimized all-to-all (originally NVSHMEM/IBGDA; NCCL GIN backend validated).</li>
 <li><strong>NIXL</strong> — NVIDIA open-source comm library for inference (KV transfer).</li>
 </ul>
 <h3 id="interconnect">Interconnect<a class="headerlink" href="#interconnect" title="Permanent link">&para;</a></h3>

@@ -12,31 +12,31 @@
         <meta name="author" content="liz-badada">
       
       
-        <link rel="canonical" href="https://liz-badada.github.io/post-training/">
+        <link rel="canonical" href="https://liz-badada.github.io/papers/category/communication/">
       
       
-        <link rel="prev" href="../training/">
+        <link rel="prev" href="../../">
       
       
-        <link rel="next" href="../agentic-rl/">
+        <link rel="next" href="../parallelism/">
       
       
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Post-training (RLHF / DPO / GRPO) - AI Infra Notes</title>
+        <title>communication - AI Infra Notes</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -55,9 +55,9 @@
       
     
     
-      <link rel="stylesheet" href="../assets/extra.css">
+      <link rel="stylesheet" href="../../../assets/extra.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#post-training" class="md-skip">
+        <a href="#communication" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="AI Infra Notes" class="md-header__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+    <a href="../../.." title="AI Infra Notes" class="md-header__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Post-training (RLHF / DPO / GRPO)
+              communication
             
           </span>
         </div>
@@ -230,7 +230,7 @@
   
   
     <li class="md-tabs__item">
-      <a href=".." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -249,7 +249,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../roadmap/" class="md-tabs__link">
+      <a href="../../../roadmap/" class="md-tabs__link">
         
   
   
@@ -266,11 +266,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../papers/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
           
   
   
@@ -292,7 +294,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../engines/" class="md-tabs__link">
+        <a href="../../../engines/" class="md-tabs__link">
           
   
   
@@ -314,7 +316,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../parallelism/" class="md-tabs__link">
+        <a href="../../../parallelism/" class="md-tabs__link">
           
   
   
@@ -332,13 +334,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../training/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../training/" class="md-tabs__link">
           
   
   
@@ -360,7 +360,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../agents/" class="md-tabs__link">
+        <a href="../../../agents/" class="md-tabs__link">
           
   
   
@@ -382,7 +382,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../hardware/" class="md-tabs__link">
+        <a href="../../../hardware/" class="md-tabs__link">
           
   
   
@@ -402,7 +402,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../projects/" class="md-tabs__link">
+      <a href="../../../projects/" class="md-tabs__link">
         
   
   
@@ -421,7 +421,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../tags/" class="md-tabs__link">
+      <a href="../../../tags/" class="md-tabs__link">
         
   
   
@@ -462,7 +462,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="AI Infra Notes" class="md-nav__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+    <a href="../../.." title="AI Infra Notes" class="md-nav__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -492,7 +492,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -519,7 +519,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../roadmap/" class="md-nav__link">
+      <a href="../../../roadmap/" class="md-nav__link">
         
   
   
@@ -543,6 +543,8 @@
       
   
   
+    
+  
   
   
     
@@ -560,20 +562,23 @@
     
     
       
+        
+        
+      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../papers/" class="md-nav__link ">
+            <a href="../../" class="md-nav__link ">
               
   
   
@@ -591,13 +596,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -627,17 +632,20 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
             
   
   
@@ -675,7 +683,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../papers/archive/2026/" class="md-nav__link">
+      <a href="../../archive/2026/" class="md-nav__link">
         
   
   
@@ -708,8 +716,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -724,18 +734,21 @@
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
             
   
   
@@ -753,7 +766,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -768,12 +781,23 @@
                 
   
   
-  
     
   
   
-    <li class="md-nav__item">
-      <a href="../papers/category/communication/" class="md-nav__link">
+    
+      
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -789,6 +813,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -803,7 +828,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../papers/category/parallelism/" class="md-nav__link">
+      <a href="../parallelism/" class="md-nav__link">
         
   
   
@@ -833,7 +858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../papers/category/perf-modeling/" class="md-nav__link">
+      <a href="../perf-modeling/" class="md-nav__link">
         
   
   
@@ -907,7 +932,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../engines/" class="md-nav__link ">
+            <a href="../../../engines/" class="md-nav__link ">
               
   
   
@@ -951,7 +976,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../kv-cache/" class="md-nav__link">
+      <a href="../../../kv-cache/" class="md-nav__link">
         
   
   
@@ -979,7 +1004,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../attention/" class="md-nav__link">
+      <a href="../../../attention/" class="md-nav__link">
         
   
   
@@ -1007,7 +1032,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scheduling/" class="md-nav__link">
+      <a href="../../../scheduling/" class="md-nav__link">
         
   
   
@@ -1035,7 +1060,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../quantization/" class="md-nav__link">
+      <a href="../../../quantization/" class="md-nav__link">
         
   
   
@@ -1101,7 +1126,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../parallelism/" class="md-nav__link ">
+            <a href="../../../parallelism/" class="md-nav__link ">
               
   
   
@@ -1145,7 +1170,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../large-scale/" class="md-nav__link">
+      <a href="../../../large-scale/" class="md-nav__link">
         
   
   
@@ -1173,7 +1198,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../communication/" class="md-nav__link">
+      <a href="../../../communication/" class="md-nav__link">
         
   
   
@@ -1201,7 +1226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../moe/" class="md-nav__link">
+      <a href="../../../moe/" class="md-nav__link">
         
   
   
@@ -1229,7 +1254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../long-context/" class="md-nav__link">
+      <a href="../../../long-context/" class="md-nav__link">
         
   
   
@@ -1261,8 +1286,6 @@
       
   
   
-    
-  
   
   
     
@@ -1280,23 +1303,20 @@
     
     
       
-        
-        
-      
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../training/" class="md-nav__link ">
+            <a href="../../../training/" class="md-nav__link ">
               
   
   
@@ -1314,13 +1334,13 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1337,37 +1357,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Post-training (RLHF/DPO/GRPO)
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../post-training/" class="md-nav__link">
         
   
   
@@ -1383,109 +1376,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sub-areas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sub-areas
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Sub-areas">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reward-modeling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reward modeling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#online-rl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Online RL
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#offline-contrastive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Offline / contrastive
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reasoning-focused-post-training" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reasoning-focused post-training
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#systems-for-rlhf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Systems for RLHF
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#canonical-references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Canonical references
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1498,7 +1388,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../agentic-rl/" class="md-nav__link">
+      <a href="../../../agentic-rl/" class="md-nav__link">
         
   
   
@@ -1560,7 +1450,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../agents/" class="md-nav__link ">
+            <a href="../../../agents/" class="md-nav__link ">
               
   
   
@@ -1604,7 +1494,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../multimodal/" class="md-nav__link">
+      <a href="../../../multimodal/" class="md-nav__link">
         
   
   
@@ -1632,7 +1522,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../diffusion/" class="md-nav__link">
+      <a href="../../../diffusion/" class="md-nav__link">
         
   
   
@@ -1694,7 +1584,7 @@
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../hardware/" class="md-nav__link ">
+            <a href="../../../hardware/" class="md-nav__link ">
               
   
   
@@ -1738,7 +1628,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../perf-modeling/" class="md-nav__link">
+      <a href="../../../perf-modeling/" class="md-nav__link">
         
   
   
@@ -1766,7 +1656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../benchmarks/" class="md-nav__link">
+      <a href="../../../benchmarks/" class="md-nav__link">
         
   
   
@@ -1801,7 +1691,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../projects/" class="md-nav__link">
+      <a href="../../../projects/" class="md-nav__link">
         
   
   
@@ -1828,7 +1718,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../tags/" class="md-nav__link">
+      <a href="../../../tags/" class="md-nav__link">
         
   
   
@@ -1868,97 +1758,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sub-areas" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sub-areas
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Sub-areas">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#reward-modeling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reward modeling
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#online-rl" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Online RL
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#offline-contrastive" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Offline / contrastive
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reasoning-focused-post-training" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reasoning-focused post-training
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#systems-for-rlhf" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Systems for RLHF
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#canonical-references" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Canonical references
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1966,105 +1765,66 @@
             
           
           
-            <div class="md-content" data-md-component="content">
-              
-              <article class="md-content__inner md-typeset">
-                
-                  
-
-  <nav class="md-tags" >
+  <div class="md-content" data-md-component="content">
+    <div class="md-content__inner">
+      <header class="md-typeset">
+        <h1 id="communication">communication<a class="headerlink" href="#communication" title="Permanent link">&para;</a></h1>
+      </header>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
     
-      
-      
-      
-      
-        <span class="md-tag">post-training</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">rl</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">rlhf</span>
-      
-    
-  </nav>
-
-
-  
-  
-
-
-<h1 id="post-training">Post-training<a class="headerlink" href="#post-training" title="Permanent link">&para;</a></h1>
-<p>Everything after pretraining + SFT. Alignment, reasoning uplift, domain adaptation.</p>
-<h2 id="sub-areas">Sub-areas<a class="headerlink" href="#sub-areas" title="Permanent link">&para;</a></h2>
-<h3 id="reward-modeling">Reward modeling<a class="headerlink" href="#reward-modeling" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Pairwise Bradley-Terry reward models.</li>
-<li>Process reward models (PRMs) — per-step scoring.</li>
-<li>Generative / LLM-as-judge rewards.</li>
-<li>Reward hacking / reward model drift.</li>
-</ul>
-<h3 id="online-rl">Online RL<a class="headerlink" href="#online-rl" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>PPO</strong> — classic RLHF.</li>
-<li><strong>GRPO</strong> (DeepSeekMath/R1) — group-relative, no value net.</li>
-<li><strong>RLOO</strong>, <strong>REINFORCE++</strong>.</li>
-<li><strong>DAPO</strong>, <strong>Dr.GRPO</strong> — fixes to GRPO.</li>
-<li>KL control, clip ratios, length bias.</li>
-</ul>
-<h3 id="offline-contrastive">Offline / contrastive<a class="headerlink" href="#offline-contrastive" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>DPO</strong> (Rafailov et al.) — closed-form for BT reward.</li>
-<li><strong>IPO / SimPO / KTO / ORPO</strong> — DPO variants.</li>
-<li><strong>Iterative DPO</strong>, <strong>online DPO</strong>.</li>
-</ul>
-<h3 id="reasoning-focused-post-training">Reasoning-focused post-training<a class="headerlink" href="#reasoning-focused-post-training" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>o1 / R1-style</strong> long chain-of-thought RL.</li>
-<li>Self-consistency, self-critique.</li>
-<li>STaR / Rest-EM / V-STaR — bootstrapped reasoning.</li>
-</ul>
-<h3 id="systems-for-rlhf">Systems for RLHF<a class="headerlink" href="#systems-for-rlhf" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>OpenRLHF</strong>, <strong>TRL</strong>, <strong>verl</strong>, <strong>NeMo-Aligner</strong>, <strong>AReaL</strong>.</li>
-<li>Rollout vs training colocation.</li>
-<li>Hybrid engine (train model + rollout model in one process).</li>
-<li>KV reuse across rollouts.</li>
-</ul>
-<h2 id="canonical-references">Canonical references<a class="headerlink" href="#canonical-references" title="Permanent link">&para;</a></h2>
-<ul>
-<li><em>InstructGPT</em> (Ouyang et al., 2022)</li>
-<li><em>Direct Preference Optimization</em> (Rafailov et al., 2023)</li>
-<li><em>DeepSeek-R1</em> (2025) — GRPO + reasoning RL</li>
-<li><em>RLHF Workflow</em> (Dong et al., 2024)</li>
-</ul>
-
-
-
-
-
-
-
-  
-  
-
-
-
-
-
-
-                
-              </article>
-            </div>
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2026-04-23 00:00:00+00:00">Apr 23, 2026</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">communication</a></li>
+        
+        
           
+          <li class="md-meta__item">
+            
+              6 min read
+            
+          </li>
+        
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="2026-04-23-nccl-gin"><a class="toclink" href="../../2026/04/23/2026-04-23-nccl-gin/">2026 04 23 nccl gin</a></h2>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2026/04/23/2026-04-23-nccl-gin/">
+          Continue reading
+        </a>
+      </nav>
+    
+    
+  </div>
+</article>
+      
+      
+        
+          
+
+
+
+<nav class="md-pagination">
+  
+</nav>
+        
+      
+    </div>
+  </div>
+
           
   <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
 
@@ -2086,7 +1846,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../training/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Pretraining &amp; SFT">
+          <a href="../../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Papers">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2096,20 +1856,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Pretraining & SFT
+                Papers
               </div>
             </div>
           </a>
         
         
           
-          <a href="../agentic-rl/" class="md-footer__link md-footer__link--next" aria-label="Next: Agentic RL">
+          <a href="../parallelism/" class="md-footer__link md-footer__link--next" aria-label="Next: parallelism">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Agentic RL
+                parallelism
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2162,12 +1922,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "toc.follow", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "toc.follow", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../assets/extra.js"></script>
+        <script src="../../../assets/extra.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
