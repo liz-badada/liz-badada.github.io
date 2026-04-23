@@ -11,6 +11,7 @@ Dated reading notes. Each note carries frontmatter: `arxiv`, `venue`, `tags`, `c
 
 | Date | Title | Category | Tags | Tier |
 |---|---|---|---|---|
+| 2026-04-23 | [GPU-Initiated Networking for NCCL (NCCL GIN)](posts/2026-04-23-nccl-gin.md) | `communication` | nccl · gin · rdma · moe · deepep | L3 |
 | 2026-04-20 | [AFD Challenges for Modern MoE Models and Hardware](posts/2026-04-20-afd-challenges.md) | `parallelism` | afd · moe · roofline | L4 |
 | 2026-04-09 | [Theoretically Optimal Attention/FFN Ratios in Disaggregated LLM Serving](posts/2026-04-09-afd-optimal-ratio.md) | `parallelism` | afd · perf-modeling | L4 |
 | 2026-04-09 | [Frontier: Simulating the Next Generation of LLM Inference Systems](posts/2026-04-09-frontier-simulator.md) | `perf-modeling` | simulation · moe · disagg | L3 |

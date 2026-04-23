@@ -17,8 +17,10 @@ The glue between parallelism and hardware. Often what separates 40% MFU from 60%
 
 ### Libraries & algorithms
 - **NCCL** — tree / ring / double-binary-tree.
+- **NCCL Device API (2.28+)** — device-callable primitives: LSA (NVLink/PCIe), Multimem (NVLink SHARP), **GIN** (RDMA over IB/RoCE). See [note → GPU-Initiated Networking for NCCL](../papers/posts/2026-04-23-nccl-gin.md).
 - **MSCCL / MSCCL++** — synthesized collectives, GPU-initiated comm.
-- **DeepEP** — DeepSeek's EP-optimized all-to-all.
+- **NVSHMEM / IBGDA** — OpenSHMEM-style device-initiated RDMA (standalone runtime, PGAS).
+- **DeepEP** — DeepSeek's EP-optimized all-to-all (originally NVSHMEM/IBGDA; NCCL GIN backend validated).
 - **NIXL** — NVIDIA open-source comm library for inference (KV transfer).
 
 ### Interconnect
