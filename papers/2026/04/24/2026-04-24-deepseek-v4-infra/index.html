@@ -1,0 +1,3063 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on LLM inference, training, RL, agents, multimodal, and GPU systems — from papers and open-source projects.">
+      
+      
+        <meta name="author" content="liz-badada">
+      
+      
+        <link rel="canonical" href="https://liz-badada.github.io/papers/2026/04/24/2026-04-24-deepseek-v4-infra/">
+      
+      
+        <link rel="prev" href="../2026-04-24-deepseek-v4/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>2026 04 24 deepseek v4 infra - AI Infra Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deepseek-v4-6144-flopsbyte" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="AI Infra Notes" class="md-header__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Infra Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2026 04 24 deepseek v4 infra
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/liz-badada/liz-badada.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    liz-badada/liz-badada.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Papers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../engines/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Inference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../parallelism/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Parallelism & Comm
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Training & RL
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../agents/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Applications
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../hardware/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Foundations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../projects/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Projects
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../tags/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Tags
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="AI Infra Notes" class="md-nav__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Infra Notes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/liz-badada/liz-badada.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    liz-badada/liz-badada.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Papers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Papers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Categories
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Categories
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    large-scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    moe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/perf-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    perf-modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../engines/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache & Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention & Kernels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../scheduling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduling & Batching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & Compression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../parallelism/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallelism & Comm
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Parallelism & Comm
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ultra-scale Training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Communication & Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MoE Systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../long-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Long Context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training & RL
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Training & RL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../post-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-training (RLHF/DPO/GRPO)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../agentic-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic RL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../agents/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal & Omni
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion & Gen Media
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../hardware/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../perf-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perf Modeling & Simulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks & Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tags
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fine-grained-ep-overlap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fine-Grained EP Overlap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fine-Grained EP Overlap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#comm-latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comm latency 为什么可以被隐藏
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 调度
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6144-flopsbyte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6144 FLOPs/Byte
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tilelang-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TileLang Kernel 开发
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TileLang Kernel 开发">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#host-codegen" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Host Codegen
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#z3-smt-solver" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Z3 SMT Solver
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bitwise-reproducibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bitwise Reproducibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#batch-invariant-deterministic-kernels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch-Invariant &amp; Deterministic Kernels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Batch-Invariant &amp; Deterministic Kernels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#batch-invariance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Batch Invariance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deterministic-backward" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deterministic Backward
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fp4-quantization-aware-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FP4 Quantization-Aware Training
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FP4 Quantization-Aware Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fp4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        哪里用 FP4
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mxfp4-lossless-dequant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MXFP4 和 lossless dequant
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hopper-blackwell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对 Hopper / Blackwell 代差的含义
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练框架
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="训练框架">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#muon-zero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Muon 的 ZeRO 异构策略
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mhc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mHC 实现优化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contextual-parallelism-for-1m" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contextual Parallelism for 1M
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extended-autograd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extended Autograd
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        推理框架
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="推理框架">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#heterogeneous-kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heterogeneous KV Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#on-disk-kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        On-Disk KV Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rl-opd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RL 与 OPD 基础设施
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RL 与 OPD 基础设施">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fp4-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FP4 Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#full-vocabulary-opd-teacher-scheduling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full-Vocabulary OPD Teacher Scheduling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preemptible-fault-tolerant-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Preemptible &amp; Fault-Tolerant Rollout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1m-ctx-rl-loader" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1M ctx 的 RL 数据 loader
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dsec-sandbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DSec Sandbox
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Post-Training 方法学
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Post-Training 方法学">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#specialist-on-policy-distillation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Specialist + On-Policy Distillation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generative-reward-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generative Reward Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tool-call-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tool-Call Schema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interleaved-thinking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interleaved Thinking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#quick-instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quick Instruction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结论与官方自评
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="结论与官方自评">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        官方承认"架构偏复杂"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        承认几个机制原理未明
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        官方 roadmap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nv-infra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        对 NV infra 的几个判断
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        还没覆盖
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        相关链接
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2026-04-24 00:00:00+00:00" class="md-ellipsis">Apr 24, 2026</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/large-scale/">large-scale</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              12 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">deepseek</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ep-overlap</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">fp4-qat</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">infra</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">kv-cache</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rl-infra</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">sandbox</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">tilelang</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<!-- more -->
+
+<h1 id="deepseek-v4-6144-flopsbyte">DeepSeek-V4 基础设施拆解：6144 FLOPs/Byte 是怎么来的？<a class="headerlink" href="#deepseek-v4-6144-flopsbyte" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>By: DeepSeek-AI · 2026-04-24 发布</p>
+<p>架构篇：<a href="../2026-04-24-deepseek-v4/">DeepSeek-V4：MLA 彻底不用了？</a></p>
+<p>对应 Tech Report Section 3 / 5.1 / 5.2 / 6</p>
+</blockquote>
+<h2 class="tldr-heading" id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">&para;</a></h2>
+<p>架构篇（Section 2）讲了 V4 模型层面"换了什么"。这篇讲的是让这些架构跑起来的<strong>工程</strong>——对做 inference/training infra 的人来说，Section 3 和 5.2 比 Section 2 更直接相关。</p>
+<p>其中有几个值得单独拎出来的结论：</p>
+<p>第一，<strong>V4 单卡 EP 做 comm/compute overlap 的目标点是 <code>C/B ≤ 2d = 6144 FLOPs/Byte</code></strong>（V4-Pro 的具体数值）。Tech Report 直接给 NV / AMD / 华为下战书："bandwidth 堆过这个阈值就不再有边际收益，把硅面积让给算力"。</p>
+<p>第二，<strong>FP4 → FP8 dequantization 是无损的</strong>（FP8 E4M3 比 FP4 E2M1 多 2 个 exponent bits 足够吸收 fine-grained scale）。这条对 Hopper 部署很关键——之前架构篇里我对 "Hopper 代差拉大" 的判断要修正，memory-bound 场景下 H100 / H200 吃到 V4 的大部分收益。</p>
+<p>第三，<strong>传统 PagedAttention 的一刀切 page 假设被 V4 打破了</strong>。Hybrid Attention 导致每层 KV cache 大小不一、还要和 Sliding Window 的 state cache 分开管。SGLang day-0 PR 走的是 RadixAttention 变种而不是 PagedAttention，就是这个原因。</p>
+<p>顺着 Tech Report Section 3 的组织讲，从 EP overlap 一直到 DSec sandbox。末尾接 Section 5 的 post-training 方法学和 Section 6 的官方自评。</p>
+<h2 id="fine-grained-ep-overlap">Fine-Grained EP Overlap<a class="headerlink" href="#fine-grained-ep-overlap" title="Permanent link">&para;</a></h2>
+<h3 id="comm-latency">Comm latency 为什么可以被隐藏<a class="headerlink" href="#comm-latency" title="Permanent link">&para;</a></h3>
+<p>V4 做 expert parallelism 的 comm/compute overlap 把 V3 的 DualPipe 思路又细化了一级。起点是 Tech Report 的一个关键 profile 观察：</p>
+<blockquote>
+<p>"Our profiling reveals that within a single MoE layer, the total time of communication is less than that of the computation. Therefore, after fusing communication and computation into a unified pipeline, computation remains the dominant bottleneck, implying that the system can tolerate lower interconnect bandwidth without degrading end-to-end performance."</p>
+</blockquote>
+<p>每个 MoE layer 有 4 阶段：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Dispatch (comm) → Linear-1 (compute) → Activation → Linear-2 (compute) → Combine (comm)
+</span></code></pre></div>
+<p>总 comm 时间 &lt; 总 compute 时间，所以关键不是"怎么减少 comm"，而是"怎么把 comm 藏进 compute 里"。</p>
+<h3 id="wave">Wave 调度<a class="headerlink" href="#wave" title="Permanent link">&para;</a></h3>
+<p>Comet（Zhang et al. 2025b，对标 baseline）的做法是 Dispatch 和 Linear-1 overlap、Linear-2 和 Combine overlap，两个 coarse-grained 区间。V4 把粒度又降了一级——<strong>把 experts 切成 waves</strong>，每个 wave 是一小撮 experts。稳态下一个 wave 的 comm 完成立刻启动它的 compute，同时下一 wave 的 token transfer、上 wave 的结果回传三路并发。expert-level pipeline 全程连续，compute 和 comm 都不空转。</p>
+<p>效果（官方数字，对标 non-fused baseline）：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>加速</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>常规推理 workload</td>
+<td>1.50 ~ 1.73×</td>
+</tr>
+<tr>
+<td>RL rollout / 高速 agent serving（长尾 small batch）</td>
+<td>1.96×</td>
+</tr>
+</tbody>
+</table>
+<p>实现以 <strong>MegaMoE</strong> 的名字开源，作为 DeepGEMM 的一个组件：<a href="https://github.com/deepseek-ai/DeepGEMM/pull/304">github.com/deepseek-ai/DeepGEMM/pull/304</a>。在 NVIDIA GPU 和华为 Ascend NPU 两个平台都验证过。</p>
+<h3 id="6144-flopsbyte">6144 FLOPs/Byte<a class="headerlink" href="#6144-flopsbyte" title="Permanent link">&para;</a></h3>
+<p>Tech Report 3.1 末尾直接给硬件厂商下了一份"客户需求书"，对 NV infra 视角是罕见的甲方输入。核心是推导出 compute-to-communication ratio 的目标点：</p>
+<p>设峰值算力 <code>C</code>、互联带宽 <code>B</code>。全部 overlap 的充要条件是 <code>C/B ≤ V_comp / V_comm</code>。对 V4-Pro，每个 token-expert 对需要：</p>
+<ul>
+<li>FLOPs：<code>6hd</code>（SwiGLU 的 gate / up / down 三个 projection；<code>h</code> = hidden size，<code>d</code> = intermediate size）</li>
+<li>Bytes：<code>3h</code>（FP8 Dispatch + BF16 Combine）</li>
+</ul>
+<p>代入：</p>
+<div class="arithmatex">\[\frac{C}{B} \leq \frac{V_{\text{comp}}}{V_{\text{comm}}} = \frac{6hd}{3h} = 2d = 6144 \text{ FLOPs/Byte}\]</div>
+<p>也就是每 1 GB/s 互联带宽足够吃掉 6.1 TFLOP/s 的算力。DeepSeek 的话讲得很直白：</p>
+<blockquote>
+<p>"Once bandwidth meets this threshold, it ceases to be the bottleneck, and devoting additional silicon area to further bandwidth brings diminishing returns. We encourage future hardware designs to target such balance points rather than scale bandwidth unconditionally."</p>
+</blockquote>
+<p>除了这个带宽 / 算力比，Tech Report 还顺带提了三条给硬件设计的建议：</p>
+<p><strong>Power budget</strong>。极端 kernel fusion 会让 compute / memory / network 同时满载，power throttling 变成关键瓶颈。下一代硬件需要为 concurrent workload 预留足够的 power headroom。</p>
+<p><strong>Communication primitives</strong>。V4 选了 pull-based ——每个 GPU 主动从远端 GPU 读数据——原因是 fine-grained push 的 notification latency 太高。对 NVSHMEM IBGDA 的 push-based 语义是暗戳戳的批评。未来硬件需要 low-latency cross-GPU signaling 才能让 push 可行。</p>
+<p><strong>Activation function</strong>。Tech Report 直接提议用没有 exp / division 的 element-wise 激活替代 SwiGLU。对下一代模型是个信号——SwiGLU 未必是最终答案，exp 对硬件太不友好。</p>
+<h2 id="tilelang-kernel">TileLang Kernel 开发<a class="headerlink" href="#tilelang-kernel" title="Permanent link">&para;</a></h2>
+<p>V4 几乎所有 custom kernel 都用 <a href="https://github.com/tile-ai/tilelang">TileLang</a>（Wang et al., ICLR 2026）写，不直接写 CUDA、也不依赖 CUTLASS。Tech Report 给的理由是：</p>
+<blockquote>
+<p>"In practice, our elaborate model architecture would have resulted in hundreds of fine-grained Torch ATen operators."</p>
+</blockquote>
+<p>V4 架构（CSA、HCA、mHC、Hybrid MoE）要生成的 fused kernel 数量很大，手写 CUDA 不现实。TileLang 是一个 DSL，能快速迭代 + 生成高性能 kernel。有三个工程细节值得单独记一下。</p>
+<h3 id="host-codegen">Host Codegen<a class="headerlink" href="#host-codegen" title="Permanent link">&para;</a></h3>
+<p>加速器越快，CPU 侧 launch overhead 越致命。V4 把大部分 host-side 逻辑（shape / dtype 校验、layout 检查）<strong>从 Python 搬到生成的 host code 里</strong>，基于 TVM-FFI 框架 + 零拷贝 tensor interop。</p>
+<p>结果：<strong>per-invocation 的 host validation overhead 从几十-几百 μs 降到 &lt; 1 μs</strong>。</p>
+<h3 id="z3-smt-solver">Z3 SMT Solver<a class="headerlink" href="#z3-smt-solver" title="Permanent link">&para;</a></h3>
+<p>TileLang compiler pass 里的整数表达式（layout inference、memory hazard detection、bound analysis）翻译成 Z3 的 quantifier-free non-linear integer arithmetic (QF_NIA)，用 SMT solver 证明优化需要的 invariant。</p>
+<p>对 vectorization、barrier insertion、code simplification 多个 pass 都有影响。编译时间仅多几秒。</p>
+<h3 id="bitwise-reproducibility">Bitwise Reproducibility<a class="headerlink" href="#bitwise-reproducibility" title="Permanent link">&para;</a></h3>
+<p>数值严格度上，TileLang 默认禁用 fast-math；<code>T.__exp / T.__log / T.__sin</code> 是 opt-in 的近似算子；提供 <code>T.ieee_fsqrt / T.ieee_fdiv / T.ieee_add</code> 等 IEEE-754 严格算子；<code>T.annotate_layout</code> 让开发者钉死 layout，确保和 CUDA baseline bit-identical。</p>
+<h2 id="batch-invariant-deterministic-kernels">Batch-Invariant &amp; Deterministic Kernels<a class="headerlink" href="#batch-invariant-deterministic-kernels" title="Permanent link">&para;</a></h2>
+<p>V4 有一个非常硬核的工程目标：<strong>train / post-train / inference 三个阶段 bitwise 对齐</strong>。意义：</p>
+<ul>
+<li>调试稳定性问题时能精准定位数值源头</li>
+<li>Post-training 行为不受 batch 组合影响</li>
+<li>RL rollout 和 training 之间没有数值漂移</li>
+</ul>
+<h3 id="batch-invariance">Batch Invariance<a class="headerlink" href="#batch-invariance" title="Permanent link">&para;</a></h3>
+<p>同一个 token 在不同 batch 里输出要完全 bit 相同。实现里有两处关键挑战：</p>
+<p><strong>Attention</strong>。不能用 split-KV（FlashDecoding 的并行策略），它会引入不同的 reduction 顺序。V4 用 dual-kernel decoding：</p>
+<table>
+<thead>
+<tr>
+<th>Kernel</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kernel 1</td>
+<td>整个 sequence 在单个 SM 完成，适合 wave 充满的情形</td>
+</tr>
+<tr>
+<td>Kernel 2</td>
+<td>Wave 最后没填满时，多个 SM 协作，accumulation 顺序匹配 Kernel 1，用 thread-block cluster 的 distributed shared memory 做高速数据交换</td>
+</tr>
+</tbody>
+</table>
+<p>两个 kernel bitwise 一致，batch-invariant decoding 的 overhead 可以忽略。</p>
+<p><strong>Matrix Multiplication</strong>。cuBLAS 不满足 batch invariance，split-K 也不行（不同 split 数产生不同 reduction 顺序）→ <strong>V4 全面用 <a href="https://github.com/deepseek-ai/DeepGEMM">DeepGEMM</a> 替代 cuBLAS</strong>。small batch 场景放弃 split-K，换一套优化做到匹配或超过 split-K 性能。</p>
+<h3 id="deterministic-backward">Deterministic Backward<a class="headerlink" href="#deterministic-backward" title="Permanent link">&para;</a></h3>
+<p>训练 backward 的非确定性主要来自 <code>atomicAdd</code> 的非结合性。V4 的对策：</p>
+<table>
+<thead>
+<tr>
+<th>部位</th>
+<th>问题</th>
+<th>解法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Attention Backward</td>
+<td>sparse attention 用 atomicAdd 累加 KV token 梯度</td>
+<td>每个 SM 独立 accumulation buffer，最后做确定性全局 reduce</td>
+</tr>
+<tr>
+<td>MoE Backward</td>
+<td>多 SM 从不同 rank 写到同一 receiving rank buffer 竞争</td>
+<td>per-rank token order preprocessing + buffer isolation</td>
+</tr>
+<tr>
+<td>mHC Matmul</td>
+<td>输出维度 = 24（太小），必须用 split-K</td>
+<td>每份 split 单独输出，subsequent kernel 做 deterministic reduction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fp4-quantization-aware-training">FP4 Quantization-Aware Training<a class="headerlink" href="#fp4-quantization-aware-training" title="Permanent link">&para;</a></h2>
+<h3 id="fp4">哪里用 FP4<a class="headerlink" href="#fp4" title="Permanent link">&para;</a></h3>
+<p>V4 的 FP4 不是推理量化，是 training-aware 的真 FP4。用在两个地方：</p>
+<ul>
+<li><strong>MoE expert weights</strong>——GPU memory 的大头</li>
+<li><strong>CSA Indexer 的 QK 路径</strong>——长上下文场景下 attention 打分这一步完全跑 FP4（activations、weights、matmul 全部 FP4）</li>
+</ul>
+<p>Index scores <code>I_{t,s}</code> 本身从 FP32 降到 BF16：top-k selector 2× 加速，保持 <strong>99.7% 的 KV entry recall</strong>。</p>
+<h3 id="mxfp4-lossless-dequant">MXFP4 和 lossless dequant<a class="headerlink" href="#mxfp4-lossless-dequant" title="Permanent link">&para;</a></h3>
+<p>用的是 <strong>MXFP4</strong>（Rouhani et al. 2023，开放标准），不是 NVFP4。SGLang PR 里的 quantizer 文件命名 <code>mxfp4_deepseek.py</code> 印证了这一点。</p>
+<p>一个容易被忽视的关键 trick：<strong>FP4 → FP8 dequant 是无损的</strong>。原因是：</p>
+<ul>
+<li>FP8（E4M3）比 FP4（E2M1）多 2 个 exponent bits</li>
+<li>只要 FP4 sub-block（1 × 32 tiles）内的 scale factor 的动态范围不超过 FP8 的 dynamic range，fine-grained scale 信息可以完全被 FP8 吸收</li>
+<li>经验证当前训练权重满足这个条件</li>
+</ul>
+<p>后果：V4 整个 QAT pipeline <strong>复用现有 FP8 mixed-precision framework 零修改</strong>。Backward 对 FP8 weights 直接求导，梯度传回 FP32 master weights，等价于 STE (Straight-Through Estimator)。</p>
+<h3 id="hopper-blackwell">对 Hopper / Blackwell 代差的含义<a class="headerlink" href="#hopper-blackwell" title="Permanent link">&para;</a></h3>
+<p>这个 trick 大幅缩小了 Hopper 和 Blackwell 的代差：</p>
+<p><strong>Blackwell</strong>：原生吃 FP4，推理时最省。</p>
+<p><strong>Hopper（H100 / H200）</strong>：dequant 到 FP8 是<strong>无损的</strong>，存储还是 FP4 的空间（memory traffic 省一半），算力走 FP8 Tensor Core。</p>
+<p>架构篇里我之前写的"Hopper 代差拉大"要修正——<strong>memory-bound 场景下 Hopper 吃到 V4 的大部分收益</strong>，只在 FP4 原生 compute 密集场景才真拉开。</p>
+<h2 id="_1">训练框架<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>训练框架继承自 V3 的 stack，但要适配 V4 的几个新组件：Muon、mHC、Hybrid Attention。有四个子模块值得展开。</p>
+<h3 id="muon-zero">Muon 的 ZeRO 异构策略<a class="headerlink" href="#muon-zero" title="Permanent link">&para;</a></h3>
+<p>Muon 需要<strong>完整梯度矩阵</strong>做 Newton-Schulz 正交化，和 ZeRO 的 partition parameter matrices 思路冲突。V4 的做法是 Hybrid ZeRO。</p>
+<p><strong>Dense parameters</strong>：</p>
+<ul>
+<li>限制 ZeRO parallelism 最大尺寸</li>
+<li>背包算法分配 parameter matrices 到 ranks，保证各 rank 负载均衡</li>
+<li>Bucket padding 匹配最大 bucket（memory overhead &lt; 10%）</li>
+<li>如果 data parallelism 超限，<strong>在额外 DP group 上冗余计算 Muon update</strong>（用算力换 bucket 内存）</li>
+</ul>
+<p><strong>MoE parameters</strong>：</p>
+<ul>
+<li>每个 expert 独立优化</li>
+<li>Flatten 所有层所有 expert 的 down projections（SwiGLU 里），再 flatten up projection 和 gate matrices</li>
+<li>对 flattened vector padding 到能均分到所有 rank（不切开单个 logical matrix）</li>
+<li>expert 数量大，不限 MoE 的 ZeRO parallelism，padding 开销可忽略</li>
+</ul>
+<p><strong>其它优化</strong>：</p>
+<ul>
+<li>同 shape 连续参数自动 merge → Newton-Schulz batched 跑以提高 GPU 利用</li>
+<li>Newton-Schulz 用 BF16 matmul 仍稳定——利用这一点，MoE 梯度以 stochastic rounding 降到 BF16 做 DP all-reduce，通信量减半</li>
+<li>Two-phase reduce-scatter：先 all-to-all local gradients，再各 rank FP32 local sum，避免低精度 adder 累加误差</li>
+</ul>
+<h3 id="mhc">mHC 实现优化<a class="headerlink" href="#mhc" title="Permanent link">&para;</a></h3>
+<p>mHC 的 <code>n_hc × d</code> 扩展 residual stream 增加 activation memory 和 pipeline 通信。V4 的优化：</p>
+<ul>
+<li>Fused kernels（train + inference）</li>
+<li>Selective recomputation：重算大部分 hidden state 和 normalized layer input，避免重算 compute-heavy 操作</li>
+<li>调整 DualPipe 1F1B overlap 适配增大的 pipeline comm</li>
+</ul>
+<p>最终 mHC 的 wall-time overhead 压到 <strong>6.7% of 1F1B pipeline stage</strong>。</p>
+<h3 id="contextual-parallelism-for-1m">Contextual Parallelism for 1M<a class="headerlink" href="#contextual-parallelism-for-1m" title="Permanent link">&para;</a></h3>
+<p>常规 Context Parallelism 按 sequence 维度分 rank，每个 rank 管 <code>s</code> 个连续 token。V4 的 CP 碰到两个新问题：</p>
+<ul>
+<li>压缩比 <code>m</code> 或 <code>m'</code> 不一定整除 <code>s</code>：各 rank 压缩长度不一致</li>
+<li>压缩需要连续 <code>m</code> 个 KV entries，可能<strong>跨 CP rank 边界</strong></li>
+</ul>
+<p>V4 的两阶段通信：</p>
+<ol>
+<li>每个 <code>rank_i</code> 把本地最后 <code>m</code> 个 uncompressed KV entries 发给 <code>rank_{i+1}</code></li>
+<li><code>rank_{i+1}</code> 把这些接收的 entries 和自己的 <code>s</code> 个本地 entries 合并压缩，产生固定长度 <code>s/m + 1</code> 的 compressed entries（带一些 padding entries）</li>
+<li>All-gather 所有 rank 压缩后的 KV entries</li>
+<li>Fused select-and-pad 算子重组成完整 compressed KV（总长 <code>cp_size × s/m</code>，padding 放尾部）</li>
+</ol>
+<p>对 HCA 和 CSA 的 indexer，每个 query 的 compressed KV 可见范围可以 rule-based precompute；CSA 的 sparse attention 由 top-k selector 显式指定。</p>
+<h3 id="extended-autograd">Extended Autograd<a class="headerlink" href="#extended-autograd" title="Permanent link">&para;</a></h3>
+<p>常规 activation checkpointing 粒度太粗（整个 module），要么 recompute 太多、要么 memory 不够省。手写 forward + backward 能精细控制但代码复杂度爆炸。V4 走中间路线：<strong>tensor 级别的 checkpointing，且保留 autograd</strong>。</p>
+<ul>
+<li>基于 TorchFX 追踪完整 computation graph</li>
+<li>每个被 annotate 的 tensor → backward traversal 找到最小重算子图</li>
+<li>Recomputation 实现为<strong>直接释放 annotated tensor 的 GPU memory + 复用 storage pointer</strong>，不做 GPU memory copy</li>
+<li>Graph tracing 能自动识别 shared storage 的 tensor，做去重（比如 reshape 的输入输出共享底层 storage，只算一次）</li>
+</ul>
+<p>开发者只需要 annotate 哪些 tensor 要 checkpoint，不用关心底层 memory 管理。</p>
+<h2 id="_2">推理框架<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="heterogeneous-kv-cache">Heterogeneous KV Cache<a class="headerlink" href="#heterogeneous-kv-cache" title="Permanent link">&para;</a></h3>
+<p>V4 的 Hybrid Attention 让 KV cache <strong>每层大小不同</strong>——CSA 压 <code>m</code> 倍、HCA 压 <code>m'</code> 倍、Sliding Window Attention (SWA) 又保留 <code>n_win</code> 个未压缩 token。这完全打破了 PagedAttention 的一刀切 page 假设。</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>State Cache                  经典 KV Cache
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>┌─────────────────────┐     ┌──────────────────────┐
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>│ Request 1           │     │ Block 0              │
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>│ ┌─SWA KV─┐ ┌─未压缩─┐│    │ ┌Layer-2 CSA Indexer│
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>│ │        │ │ tail  ││    │ │Layer-2 CSA Main KV│
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>│ └────────┘ └───────┘│    │ └Layer-3 HCA KV──  │
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>│ Request 2           │     │ Layer-4 CSA...      │
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>│ ...                 │     │ Block 1, 2, ..., N  │
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>└─────────────────────┘     └──────────────────────┘
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>每 request 固定大小      每 block 容纳 lcm(m, m&#39;) 个原 token
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>per-position state     产生 k₁ = lcm(m,m&#39;)/m 个 CSA entries
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                       产生 k₂ = lcm(m,m&#39;)/m&#39; 个 HCA entries
+</span></code></pre></div>
+<p class="figcaption">图 3-1 V4 的异构 KV Cache 布局（对应 Tech Report Figure 6）</p>
+<p>分两类：</p>
+<p><strong>State Cache</strong>：存 SWA 的 KV + CSA/HCA 压缩分支里"尾巴上还没满 <code>m</code> 个 token"的 hidden state。这类完全由 request 当前位置决定，被当成 sequence state 管理，每 request 预分配固定大小。</p>
+<p><strong>经典 KV Cache</strong>：存 CSA 压缩 KV + HCA 压缩 KV + CSA Indexer 的 compressed keys。block 粒度 = <code>lcm(m, m')</code>，每 block 覆盖这么多原 token。</p>
+<p>Sparse attention kernel 要和 KV layout 协同设计才能避免性能损失。传统高性能 attention kernel 假设每 block 固定 <code>B</code> 个 token，V4 需要 variable-tokens-per-block（任意 <code>lcm(m, m')</code> 的倍数）。kernel 侧的 cache-line padding 需要和 cache layout 对齐。</p>
+<p><strong>对 vLLM / SGLang 的冲击</strong>：PagedAttention 那套"统一 page"的假设不适用。SGLang day-0 PR 里用的是 <code>deepseek_v4_backend_radix.py</code>——RadixAttention 变种，<strong>绕开了 PagedAttention 的直接路径</strong>。</p>
+<h3 id="on-disk-kv-cache">On-Disk KV Cache<a class="headerlink" href="#on-disk-kv-cache" title="Permanent link">&para;</a></h3>
+<p>V4 的部署假设<strong>磁盘 backed KV cache 是常态，不是 fallback</strong>。对 CSA/HCA compressed KV 和 SWA uncompressed KV 各自设计了磁盘存储策略。</p>
+<p>核心动机是 shared-prefix reuse——长 ctx + 多租户场景下，prefix 重用能避免大量重复 prefill。具体实现指向 <strong>3FS</strong>（DeepSeek 自家的分布式文件系统，<a href="https://github.com/deepseek-ai/3FS">github.com/deepseek-ai/3FS</a>）。</p>
+<h2 id="rl-opd">RL 与 OPD 基础设施<a class="headerlink" href="#rl-opd" title="Permanent link">&para;</a></h2>
+<p>Post-training 从 V3.2 的 "一锅炖 RL" 改成 <strong>Specialist → Unified via On-Policy Distillation</strong>。配套 infra 有五件硬核工程。</p>
+<h3 id="fp4-integration">FP4 Integration<a class="headerlink" href="#fp4-integration" title="Permanent link">&para;</a></h3>
+<p>Rollout 和 teacher inference 直接用真 FP4 权重（和线上部署一致）；training 模拟 FP4 via 前面说的 lossless FP4 → FP8 dequant。</p>
+<h3 id="full-vocabulary-opd-teacher-scheduling">Full-Vocabulary OPD Teacher Scheduling<a class="headerlink" href="#full-vocabulary-opd-teacher-scheduling" title="Permanent link">&para;</a></h3>
+<p>挑战是：10+ teacher 模型，每个可能 trillion-scale 参数；vocab size &gt; 100k；所有 teacher 同时在线不可行。V4 的解法分几层：</p>
+<table>
+<thead>
+<tr>
+<th>优化</th>
+<th>细节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Teacher 权重 offload</td>
+<td>全部存到中心化分布式存储，on-demand 加载；用 ZeRO-like sharding 缓解 I/O 和 DRAM 压力</td>
+</tr>
+<tr>
+<td>Logit 不 materialize</td>
+<td>只缓存 <strong>last-layer teacher hidden states</strong> 到中心 buffer；训练时再过对应的 prediction head 重建 full logits</td>
+</tr>
+<tr>
+<td>Sample 按 teacher 排序</td>
+<td>每个 mini-batch 只装一个 teacher head，per-head per-mini-batch 只加载一次</td>
+</tr>
+<tr>
+<td>异步加载</td>
+<td>所有 parameter / hidden-state load/offload 后台异步，不阻 critical path</td>
+</tr>
+<tr>
+<td>TileLang KL kernel</td>
+<td>Teacher / student logit 的 KL 散度用专门的 TileLang fused kernel 算，省内存 + 加速</td>
+</tr>
+</tbody>
+</table>
+<h3 id="preemptible-fault-tolerant-rollout">Preemptible &amp; Fault-Tolerant Rollout<a class="headerlink" href="#preemptible-fault-tolerant-rollout" title="Permanent link">&para;</a></h3>
+<p>大集群硬件故障常态化，RL rollout 还要支持高优先级任务打断。V4 的解法是<strong>token-granular Write-Ahead Log (WAL)</strong>：</p>
+<ul>
+<li>每 token 生成立即 append 到 request 的 WAL</li>
+<li>Preemption：暂停 engine + 保存 KV cache</li>
+<li>Resume：用 WAL + KV cache 继续 decode</li>
+<li>硬件 fatal error：用 WAL 的 tokens 重跑 prefill 重建 KV cache</li>
+</ul>
+<p>一个容易被忽视的陷阱：<strong>不能从头 regenerate 未完成 request</strong>。因为短响应更容易"活过"中断，regenerate from scratch 会让 model 产生<strong>更短的 sequence 偏差</strong>（length bias）。这是 inference-as-service 做 RL rollout 的一个微妙问题。</p>
+<h3 id="1m-ctx-rl-loader">1M ctx 的 RL 数据 loader<a class="headerlink" href="#1m-ctx-rl-loader" title="Permanent link">&para;</a></h3>
+<p>1M 序列数据的内存压力极大，V4 把 rollout 数据拆成：</p>
+<ul>
+<li><strong>轻量 metadata</strong>：全量加载到 dispatch 端做 global shuffling 和 packing 计算</li>
+<li><strong>Heavy per-token fields</strong>：用 shared-memory data loader 消除 intra-node 数据冗余；mini-batch 粒度消费完立即释放</li>
+</ul>
+<p>每 device mini-batch 数量根据负载动态调整，在 compute throughput 和 I/O overlap 之间找平衡。</p>
+<h3 id="dsec-sandbox">DSec Sandbox<a class="headerlink" href="#dsec-sandbox" title="Permanent link">&para;</a></h3>
+<p>V4 agentic post-training 和评测用的 sandbox platform 叫 <strong>DeepSeek Elastic Compute (DSec)</strong>。Rust 三件套（<code>Apiserver</code> gateway + <code>Edge</code> per-host agent + <code>Watcher</code> cluster monitor），横向扩展在 3FS 上，单集群管<strong>数十万并发 sandbox</strong>。</p>
+<p>同一个 Python SDK <code>libdsec</code> 下暴露了四种执行底座：</p>
+<table>
+<thead>
+<tr>
+<th>底座</th>
+<th>实现</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Function Call</td>
+<td>pre-warmed container pool</td>
+<td>最轻，无 cold-start，无状态 invocation</td>
+</tr>
+<tr>
+<td>Container</td>
+<td>Docker + EROFS 3FS layered storage</td>
+<td>镜像按需加载，3FS 做只读 base layer</td>
+</tr>
+<tr>
+<td>microVM</td>
+<td>Firecracker</td>
+<td>VM 级隔离，高密度</td>
+</tr>
+<tr>
+<td>fullVM</td>
+<td>QEMU + overlaybd</td>
+<td>支持任意 OS</td>
+</tr>
+</tbody>
+</table>
+<p>三个工程挑战值得单独提一下：</p>
+<p><strong>快速镜像加载</strong>。基于 3FS 的 EROFS overlay layer。镜像 metadata 预热到本地磁盘，数据块按需从 3FS 拉取。microVM 用 overlaybd——只读 base 在 3FS 跨 instance 共享，写入走本地 copy-on-write。毫秒级 resume。</p>
+<p><strong>高并发密度</strong>。去重虚拟化环境的 page cache 减少冗余内存；反向 memory reclamation 允许 safe overcommit；减少 container runtime 的 spinlock 竞争。</p>
+<p><strong>Trajectory Logging</strong>。每个 sandbox 全局有序的 trajectory log 有三个用途：preempt 后 resume 时 replay cached results（避免重复执行 non-idempotent 操作）；细粒度 provenance 追溯；deterministic replay。</p>
+<p>对做 agentic RL 基础设施的队伍，DSec 是一个相对完整的开源参考——特别是 <strong>3FS + EROFS 分层存储 + preemption-safe 的 trajectory replay</strong> 这条路。</p>
+<h2 id="post-training">Post-Training 方法学<a class="headerlink" href="#post-training" title="Permanent link">&para;</a></h2>
+<p>Infra 之外，Section 5.1 的方法学上也有几处不寻常的设计。</p>
+<h3 id="specialist-on-policy-distillation">Specialist + On-Policy Distillation<a class="headerlink" href="#specialist-on-policy-distillation" title="Permanent link">&para;</a></h3>
+<p>两阶段：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Base Model ─┬─► SFT + RL(GRPO) on Math    ──► Math Specialist ─┐
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>            ├─► SFT + RL(GRPO) on Code    ──► Code Specialist  ─┤
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>            ├─► SFT + RL(GRPO) on Agent   ──► Agent Specialist ─┼─► OPD ─► V4
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>            ├─► SFT + RL(GRPO) on IF      ──► IF Specialist    ─┤
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>            └─► ... (10+ domains)                               ─┘
+</span></code></pre></div>
+<p class="figcaption">图 3-2 V4 post-training 两阶段：先 per-domain specialist，再 multi-teacher OPD 蒸馏到单一 unified 模型</p>
+<p>OPD objective：</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{OPD}}(\theta) = \sum_{i=1}^{N} w_i \cdot D_{\text{KL}}(\pi_\theta \| \pi_{E_i})\]</div>
+<p>其中 <code>π_θ</code> 是 student（unified）policy，<code>π_{E_i}</code> 是第 <code>i</code> 个 expert。<strong>On-policy</strong>——trajectory 从 student 采样，保证 student 只从 context-relevant expert 学（math task 只学 math expert）。V4 用的是 <strong>full-vocabulary logit distillation</strong>（不是 token-level KL 估计），variance 更低、蒸馏更稳。</p>
+<h3 id="generative-reward-model">Generative Reward Model<a class="headerlink" href="#generative-reward-model" title="Permanent link">&para;</a></h3>
+<p>对 hard-to-verify task（没有规则 verifier），V4 不走 RLHF，改走 GRM：</p>
+<ul>
+<li>Actor 网络<strong>同时扮演 generator 和 judge（GRM）</strong></li>
+<li>RL optimization 直接 apply 到 GRM 本身</li>
+<li>Reasoning capability 自然融入 evaluation process</li>
+<li>只需少量人类标注（rubric-guided data），而不是大规模 preference dataset</li>
+</ul>
+<h3 id="tool-call-schema">Tool-Call Schema<a class="headerlink" href="#tool-call-schema" title="Permanent link">&para;</a></h3>
+<p>V4 抛弃了 JSON-based tool call，改用 XML-style 的 <code>&lt;|DSML|&gt;</code> special token：</p>
+<div class="language-xml highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="err">&lt;</span>|DSML|tool_calls&gt;
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="err">&lt;</span>|DSML|invoke<span class="w"> </span>name=&quot;$TOOL_NAME&quot;&gt;
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="err">&lt;</span>|DSML|parameter<span class="w"> </span>name=&quot;$PARAM_NAME&quot;<span class="w"> </span>string=&quot;true|false&quot;&gt;$VALUE<span class="err">&lt;</span>/|DSML|parameter&gt;
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="err">&lt;</span>/|DSML|invoke&gt;
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="err">&lt;</span>/|DSML|tool_calls&gt;
+</span></code></pre></div>
+<p>动机是 JSON escaping 在复杂 tool call 里容易失败；XML + special tokens 减少 tool-call error。</p>
+<h3 id="interleaved-thinking">Interleaved Thinking<a class="headerlink" href="#interleaved-thinking" title="Permanent link">&para;</a></h3>
+<p>V3.2 每次收到新 user message 就丢弃 thinking trace；V4 在 tool-calling 场景下<strong>保留全部 reasoning 跨 turn</strong>（利用 1M ctx），让 agent 能保持 coherent 累积 chain of thought。普通对话仍然丢弃以节省 token。</p>
+<h3 id="quick-instruction">Quick Instruction<a class="headerlink" href="#quick-instruction" title="Permanent link">&para;</a></h3>
+<p>常见 chatbot 需要先做一些 auxiliary task（决定是否 web search、识别意图、生成搜索 query）。V3.2 用独立的小模型做，每次要额外 prefill。V4 引入 Quick Instruction：</p>
+<table>
+<thead>
+<tr>
+<th>Special Token</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;\|action\|&gt;</code></td>
+<td>判断是否需要 web search</td>
+</tr>
+<tr>
+<td><code>&lt;\|title\|&gt;</code></td>
+<td>生成对话 title</td>
+</tr>
+<tr>
+<td><code>&lt;\|query\|&gt;</code></td>
+<td>生成搜索 query</td>
+</tr>
+<tr>
+<td><code>&lt;\|authority\|&gt;</code></td>
+<td>分类 prompt 对权威性的需求</td>
+</tr>
+<tr>
+<td><code>&lt;\|domain\|&gt;</code></td>
+<td>识别 prompt 领域</td>
+</tr>
+<tr>
+<td><code>&lt;\|extracted_url\|&gt;</code> / <code>&lt;\|read_url\|&gt;</code></td>
+<td>判断 URL 是否要抓取</td>
+</tr>
+</tbody>
+</table>
+<p>这些 token 直接附加到输入序列尾部，<strong>复用已经计算的 KV cache</strong>，避免独立小模型的重复 prefill，TTFT 显著下降。</p>
+<h2 id="_3">结论与官方自评<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Section 6 的诚实度值得专门记一下。</p>
+<h3 id="_4">官方承认"架构偏复杂"<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>"To minimize risk, we retained many preliminarily validated components and tricks, which, while effective, made the architecture relatively complex. In future iterations, we will carry out more comprehensive and principled investigations to distill the architecture down to its most essential designs, making it more elegant without sacrificing performance."</p>
+</blockquote>
+<p>翻译下就是：V4 里很多设计（CSA 的 overlapping compression、Lightning Indexer、mHC 的 Sinkhorn-Knopp、Hybrid Newton-Schulz 系数）都是"保险起见留着的"。后续会精简。</p>
+<h3 id="_5">承认几个机制原理未明<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>"Anticipatory Routing and SwiGLU Clamping have been proven effective in mitigating training instabilities, their underlying principles remain insufficiently understood."</p>
+</blockquote>
+<p>Anticipatory Routing 和 SwiGLU Clamping 在训练稳定性上有效但原理不清。而且 Section 2 里完全没提这两个东西——<strong>说明还有 trick 没公开</strong>。</p>
+<h3 id="roadmap">官方 roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h3>
+<ol>
+<li>更稀疏的 embedding 模块（Cheng et al. 2026）——暗示 MoE / 稀疏 attention 之外继续稀疏化</li>
+<li>低延迟架构——1M ctx 的部署响应要能做交互式</li>
+<li>长 horizon multi-round agentic tasks（对应 DSec 的方向）</li>
+<li>多模态（暂时是 text-only）</li>
+<li>更好的 data curation</li>
+</ol>
+<h2 id="nv-infra">对 NV infra 的几个判断<a class="headerlink" href="#nv-infra" title="Permanent link">&para;</a></h2>
+<p>这一节是我自己的 take，不是 Tech Report 内容。</p>
+<p><strong>马上能用上的</strong>。MegaMoE kernel（DeepGEMM PR #304）对自家 EP 部署是 drop-in 收益。FP4 → FP8 lossless dequant 这条让 Hopper (H100/H200) 不必被 FP4 代差拍死。Heterogeneous KV cache 思路对 vLLM / SGLang / TRT-LLM 的 PagedAttention 一刀切假设是直接挑战——SGLang PR #23600 用 RadixAttention 变种是务实选择。</p>
+<p><strong>给 CUDA kernel 生态的信号</strong>。TileLang 可能挤占 CUTLASS + cuBLAS 在 MoE / attention 场景的生态位。TileLang 不是 NV 主推，但 DeepSeek 的规模化验证给了它很强背书。NV 的应对要么是 Triton 加固、要么是官方出更强的 tile-level DSL。DeepGEMM 替代 cuBLAS 的趋势也值得 NVIDIA 的 cuBLAS 组关注——small batch、batch-invariance、split-K 限制几个场景 cuBLAS 的覆盖度不够。</p>
+<p><strong>给硬件设计的直接反馈</strong>。Tech Report 3.1 末段等于 DeepSeek 给 NV / AMD / 华为的一份甲方需求书。核心结论：<code>C/B ≤ 2d = 6144 FLOPs/Byte</code>——到了这个比例之后不要再堆带宽。Power headroom、low-latency cross-GPU signaling、hardware-friendly activation（替代 SwiGLU）是同等重要的三个补充。</p>
+<p><strong>EP / PD 分离叙事的延续</strong>。V4 把 <code>C/B</code> 目标推到 6144 → 未来 EP 部署不再"越大带宽越好"，要算清楚 comp/comm ratio。1M ctx KV cache 10% + On-Disk 存储 → PD 分离 + KV mover 的带宽压力进一步降。NIXL / Dynamo KV Router / DeepEP v2 + NCCL GIN 这条链正好对接。</p>
+<p><strong>Agentic infra 的参考</strong>。DSec 对做 agentic RL 基础设施的队伍是硬参考实现。3FS + EROFS + microVM 这条栈可以直接借鉴。NV 自己的 Nemo-Agent 这类项目可以看看能否整合。</p>
+<h2 id="_6">还没覆盖<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>Tech Report Section 4（Pre-Training：data construction / training setup / mitigating instability）架构篇和这篇都还没读。Anticipatory Routing 和 SwiGLU Clamping 的具体 recipe 在 Section 4.2.3 提到一点但不足以复现，需要等续作或社区复现。</p>
+<p>Section 5.3（Standard Benchmark Evaluation）和 Section 5.4（Performance on Real-World Tasks）的完整数据（MRCR 长上下文曲线、Terminal Bench 细节、Chinese writing / white-collar 的 human eval）架构篇里只列了核心 benchmark table，完整 per-mode 的对比还可以再展开。</p>
+<p>后续有进展再更新。</p>
+<h2 id="_7">相关链接<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>一手：</p>
+<ul>
+<li><a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf">Tech Report PDF</a>（Section 3 / 5 / 6）</li>
+<li><a href="https://github.com/deepseek-ai/DeepGEMM/pull/304">MegaMoE in DeepGEMM</a></li>
+<li><a href="https://github.com/deepseek-ai/3FS">3FS</a></li>
+<li><a href="https://github.com/tile-ai/tilelang">TileLang</a>（Wang et al., ICLR 2026）</li>
+<li><a href="https://arxiv.org/abs/2512.24880">mHC paper</a>（Xie et al., 2026）</li>
+</ul>
+<p>相关：</p>
+<ul>
+<li><a href="https://arxiv.org/abs/2502.16982">Muon is scalable for LLM training</a>（Liu et al., Kimi team 2025）</li>
+<li><a href="https://thinkingmachines.ai/blog/on-policy-distillation">On-Policy Distillation</a>（Lu &amp; TM Lab, 2025）</li>
+<li><a href="https://proceedings.neurips.cc/paper/2021/hash/92bf5e6240737e0326ea59846a83e076-Abstract.html">Hash Layers for Large Sparse Models</a>（Roller et al., NeurIPS 2021）</li>
+</ul>
+<p>生态：</p>
+<ul>
+<li><a href="https://github.com/sgl-project/sglang/pull/23600">SGLang day-0 PR #23600</a></li>
+</ul>
+<p>KB 内：</p>
+<ul>
+<li>架构篇：<a href="../2026-04-24-deepseek-v4/">DeepSeek-V4：MLA 彻底不用了？</a></li>
+<li><a href="../../../../../projects/deepep/">DeepEP 项目笔记</a></li>
+<li><a href="../../23/2026-04-23-nccl-gin/">NCCL GIN</a></li>
+<li><a href="../../20/2026-04-20-afd-challenges/">AFD Challenges</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../2026-04-24-deepseek-v4/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2026 04 24 deepseek v4">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                2026 04 24 deepseek v4
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/liz-badada" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "toc.follow", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../assets/extra.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

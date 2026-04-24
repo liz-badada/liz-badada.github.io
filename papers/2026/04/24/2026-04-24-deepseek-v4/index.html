@@ -12,13 +12,13 @@
         <meta name="author" content="liz-badada">
       
       
-        <link rel="canonical" href="https://liz-badada.github.io/papers/2026/04/20/2026-04-20-afd-challenges/">
+        <link rel="canonical" href="https://liz-badada.github.io/papers/2026/04/24/2026-04-24-deepseek-v4/">
       
       
-        <link rel="prev" href="../../09/2026-04-09-afd-optimal-ratio/">
+        <link rel="prev" href="../../23/2026-04-23-nccl-gin/">
       
       
-        <link rel="next" href="../../23/2026-04-23-nccl-gin/">
+        <link rel="next" href="../2026-04-24-deepseek-v4-infra/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>2026 04 20 afd challenges - AI Infra Notes</title>
+        <title>2026 04 24 deepseek v4 - AI Infra Notes</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#afd-moe-dead-zone" class="md-skip">
+        <a href="#deepseek-v4mla" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              2026 04 20 afd challenges
+              2026 04 24 deepseek v4
             
           </span>
         </div>
@@ -1830,43 +1830,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#afd-3bo-slo" class="md-nav__link">
+  <a href="#deepseek-v4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AFD 的性能预算：3BO + SLO
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#s_t-ofu-hfu" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        三层利用率：S_t · OFU · HFU
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#budget-based-hfu-dead-zone" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget-Based HFU 与 dead zone
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#afd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        不均衡敏感性：AFD 的阿喀琉斯之踵
+        DeepSeek-V4 概览
       
     </span>
   </a>
@@ -1877,7 +1844,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        硬件 × 模型矩阵
+        整体结构
       
     </span>
   </a>
@@ -1885,32 +1852,71 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#afd-vs" class="md-nav__link">
+  <a href="#hybrid-attention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AFD 友好 vs. 不友好
+        Hybrid Attention
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#afd-vs_1" class="md-nav__link">
+    <nav class="md-nav" aria-label="Hybrid Attention">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#csa" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AFD vs. 其他架构
+        CSA
       
     </span>
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#hca" class="md-nav__link">
+    <span class="md-ellipsis">
       
-        <li class="md-nav__item">
+        HCA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        实现层面的挑战
+        其他组件
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-attention_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Attention 小结
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mhc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mHC
       
     </span>
   </a>
@@ -1918,10 +1924,82 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#afd-challenges" class="md-nav__link">
+  <a href="#muon" class="md-nav__link">
     <span class="md-ellipsis">
       
-        AFD Challenges 小结
+        Muon 优化器
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MoE 调整
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MoE 调整">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hash-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hash routing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fp4-fp8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FP4 + FP8 混合精度训练
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#post-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        训练数据与 Post-training
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#v32-v4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        V3.2 → V4 对比
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark
       
     </span>
   </a>
@@ -1930,6 +2008,28 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        部署视角的几个快速判断
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        还没覆盖的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
       
         相关链接
@@ -1976,7 +2076,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-20 00:00:00+00:00" class="md-ellipsis">Apr 20, 2026</time>
+                        <time datetime="2026-04-24 00:00:00+00:00" class="md-ellipsis">Apr 24, 2026</time>
                       </div>
                     </li>
                     
@@ -1987,7 +2087,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/parallelism/">parallelism</a></span>
+                              <a href="../../../../category/moe/">moe</a></span>
                         </div>
                       </li>
                     
@@ -1998,7 +2098,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              5 min read
+                              12 min read
                             
                           </span>
                         </div>
@@ -2026,7 +2126,35 @@
       
       
       
-        <span class="md-tag">afd</span>
+        <span class="md-tag">deepseek</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">fp4</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">hybrid-attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">long-context</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">mhc</span>
       
     
       
@@ -2040,14 +2168,7 @@
       
       
       
-        <span class="md-tag">parallelism</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">roofline</span>
+        <span class="md-tag">muon</span>
       
     
   </nav>
@@ -2059,393 +2180,608 @@
 
 <!-- more -->
 
-<h1 id="afd-moe-dead-zone">AFD 真的通用吗？标准集群 + 细粒度 MoE 下的 dead zone<a class="headerlink" href="#afd-moe-dead-zone" title="Permanent link">&para;</a></h1>
+<h1 id="deepseek-v4mla">DeepSeek-V4：MLA 彻底不用了？<a class="headerlink" href="#deepseek-v4mla" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>arXiv:2602.09721v1 · Guowei Liu, Hongming Li, Yaning Guo, Yongxi Lyu, Mo Zhou, Yi Liu, Zhaogeng Li, Yanpeng Wang (Baige AI Team, Baidu Inc.)</p>
+<p>By: DeepSeek-AI · 2026-04-24 发布（preview）</p>
+<p>Tech Report：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf">DeepSeek_V4.pdf</a> · Weights：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro">deepseek-ai/DeepSeek-V4-Pro</a></p>
+<p>姊妹篇：<a href="../2026-04-24-deepseek-v4-infra/">DeepSeek-V4 基础设施拆解</a>（Section 3 / 5 / 6）</p>
 </blockquote>
 <h2 class="tldr-heading" id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">&para;</a></h2>
-<p>AFD（Attention-FFN Disaggregation）的宣传卖点是通过极大聚合 FFN 批量在 MoE 模型上榨出高 HFU。但在当前主流的<strong>标准集群</strong>（非 Superpod，比如 H800）+ <strong>细粒度 MoE 模型</strong>（DeepSeek-V3、Kimi-K2、Qwen3-Coder）下，AFD 实际收益远不如宣称。</p>
-<p>本文用扩展 roofline + 不均衡敏感性分析给出一份清单式判决：H800 上 DeepSeek-V3 的 AFD 理论 HFU 上限<strong>只有 33%</strong>，且存在 "dead zone"——到了这个上限后<strong>增加 FFN 节点数无法提升 HFU</strong>，因为 scale-out 带宽已经封顶。对 DP/EP 负载不均衡，AFD 的容忍度也显著低于 Large-Scale EP。<strong>Superpod（GB200/GB300）+ 粗粒度 MoE（M ≥ 5120，稀疏度 ≤ 16）</strong> 才是 AFD 的真正用武之地。</p>
-<p>行业趋势与 AFD 友好方向相反——MoE 越来越细粒度、越来越稀疏。所以标准集群上，<strong>Large-Scale EP 仍是最佳选择</strong>，AFD 不是通用优化。</p>
-<h2 id="afd-3bo-slo">AFD 的性能预算：3BO + SLO<a class="headerlink" href="#afd-3bo-slo" title="Permanent link">&para;</a></h2>
-<p>AFD 要用 <strong>3-batch overlap（3BO）</strong>才能隐藏 Attention↔FFN 的 per-layer 通信延迟：</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Batch 1: Attn  →  A2F  →  FFN  →  F2A
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Batch 2:        Attn  →  A2F  →  FFN  →  F2A
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Batch 3:              Attn  →  A2F  →  FFN  →  F2A
+<p>DeepSeek 2026-04-24 放出 V4 家族 preview：V4-Pro 1.6T 总参 / 49B 激活，V4-Flash 284B / 13B，原生支持 1M 上下文。HF 权重、Tech Report、SGLang day-0 PR 同日到位。</p>
+<p>V4 最刺眼的结构改动是 attention：<strong>MLA 被完全换掉</strong>。V2 到 V3.2 一路沿用的 Multi-head Latent Attention 在 V4 的 Section 2 里既不在"继承列表"里，也不在任何细节描述里出现。取代它的是 <strong>Hybrid Attention = CSA (Compressed Sparse Attention) + HCA (Heavily Compressed Attention)</strong>，两种按层 interleave。带来的效率提升很夸张：1M 上下文下单 token 推理 FLOPs 仅为 V3.2 的 27%，KV cache 仅为 10%；对比朴素 BF16 GQA8 baseline，KV cache 压到 2%。</p>
+<p>自然会问：MLA 真的一点也不要了？CSA / HCA 具体是怎么构造的？对 Hopper / Blackwell 部署到底意味着什么？这篇笔记沿着 Tech Report Section 2 把架构捋一遍；训练和推理的 infra 部分走到姊妹篇。</p>
+<h2 id="deepseek-v4">DeepSeek-V4 概览<a class="headerlink" href="#deepseek-v4" title="Permanent link">&para;</a></h2>
+<p>V4 家族首批放出 4 个权重仓库：</p>
+<table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>总参数</th>
+<th>激活参数</th>
+<th>上下文</th>
+<th>License</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeepSeek-V4-Pro</td>
+<td>1.6T</td>
+<td>49B</td>
+<td>1M 原生</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>DeepSeek-V4-Flash</td>
+<td>284B</td>
+<td>13B</td>
+<td>1M 原生</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>DeepSeek-V4-Pro-Base</td>
+<td>1.6T</td>
+<td>—</td>
+<td>1M 原生</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td>DeepSeek-V4-Flash-Base</td>
+<td>284B</td>
+<td>—</td>
+<td>1M 原生</td>
+<td>MIT</td>
+</tr>
+</tbody>
+</table>
+<p>HF 列表页显示的 862B / 158B / 292B / 1.6T 是 Safetensors 下载体积（FP4/FP8 量化后），不是参数量本身。训练 tokens 分别是 V4-Pro 33T、V4-Flash 32T，约为 V3.2 的两倍。</p>
+<p>从 V3 继承的东西很少，Tech Report 明确只列了两件：<strong>Transformer 骨架 + MTP（Multi-Token Prediction）</strong>。MoE 组件是 DeepSeekMoE（有微调）。其它全部是新的。</p>
+<h2 id="_1">整体结构<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+  IN[Input Tokens] --&gt; EMB[Embedding]
+  EMB --&gt; BLK1["Transformer Block 1..k&lt;br/&gt;前几层 Hash-routed MoE"]
+  BLK1 --&gt; BLKN["Transformer Block k+1..L&lt;br/&gt;后续层 DeepSeekMoE"]
+  BLKN --&gt; HEAD[Prediction Head]
+  HEAD --&gt; LMLOSS[LM Loss]
+  BLKN --&gt; MTP[MTP Modules]
+  MTP --&gt; MTPLOSS[MTP Loss]
+
+  classDef hilite fill:#fff4cc,stroke:#c9a227;
+  class BLK1,BLKN hilite;</code></pre>
+<p class="figcaption">图 2-1 DeepSeek-V4 顶层架构：前若干层用 Hash routing 的 MoE，后续层用学习式 DeepSeekMoE；顶部同时挂 LM head 和 MTP head</p>
+<p>单个 Transformer Block 内，attention 子层和 FFN 子层各自被一层 mHC 残差混合包住：</p>
+<pre class="mermaid"><code>graph TB
+  X_IN["x_in (residual)"] --&gt; PreA[Pre-Block Mixing]
+  PreA --&gt; ATTN["CSA or HCA"]
+  ATTN --&gt; PostA[Post-Block Mixing]
+  PostA --&gt; MIX1["⊕ mHC Residual Mixing"]
+  X_IN -.-&gt; MIX1
+  MIX1 --&gt; MID["residual mid"]
+  MID --&gt; PreF[Pre-Block Mixing]
+  PreF --&gt; FFN["DeepSeekMoE&lt;br/&gt;(前几层 Hash routing)"]
+  FFN --&gt; PostF[Post-Block Mixing]
+  PostF --&gt; MIX2["⊕ mHC Residual Mixing"]
+  MID -.-&gt; MIX2
+  MIX2 --&gt; X_OUT[x_out]
+
+  classDef attn fill:#d4f1c5,stroke:#3a7a3a;
+  classDef ffn fill:#e8d5f1,stroke:#6a3a7a;
+  classDef mhc fill:#fce6d4,stroke:#b85c1a;
+  class ATTN attn;
+  class FFN ffn;
+  class MIX1,MIX2 mhc;</code></pre>
+<p class="figcaption">图 2-2 单个 Transformer Block：attention / FFN 两个子层各自包一层 mHC 残差</p>
+<p>层总数 <code>L</code>、前几层用 Hash routing 的数量 <code>k</code>、CSA 与 HCA 的层间分配比例，Tech Report Section 2 没给具体数字，需要看 HF 仓库 <code>inference/</code> 下的参考实现。</p>
+<h2 id="hybrid-attention">Hybrid Attention<a class="headerlink" href="#hybrid-attention" title="Permanent link">&para;</a></h2>
+<p>Section 2 开头一句话把 V4 和 V3 的关系讲清楚了：</p>
+<blockquote>
+<p>"Compared with the DeepSeek-V3 architecture, DeepSeek-V4 series retain the DeepSeekMoE framework and Multi-Token Prediction (MTP) strategy, while introducing several key innovations in architecture and optimization. ... CSA compresses the KV caches along the sequence dimension and then performs DeepSeek Sparse Attention (DSA), whereas HCA applies more aggressive compression to the KV caches but keeps dense attention."</p>
+</blockquote>
+<p>MLA 不在"retain"里，MoE 微调里也没提到。<strong>MLA 在 V4 彻底退出</strong>。但这并不是"推倒重来"。更准确的描述是：<strong>换了 KV 的压缩轴</strong>。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>KV 压缩轴</th>
+<th>Core attention</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MLA（V2 / V3 / V3.2）</td>
+<td>latent 维度：KV 压成低秩 latent，attention 时 per-head 展开</td>
+<td>Multi-head</td>
+</tr>
+<tr>
+<td>V4 CSA</td>
+<td>sequence 维度：每 m 个 token 的 KV softmax 加权聚合成 1 个 entry → 过 DSA 选 top-k</td>
+<td><strong>Shared-KV MQA</strong>（所有 head 共享压缩后 KV）</td>
+</tr>
+<tr>
+<td>V4 HCA</td>
+<td>同 CSA 结构，压缩比 m' ≫ m，<strong>dense attention</strong>（不做稀疏选 top-k）</td>
+<td>Shared-KV MQA</td>
+</tr>
+</tbody>
+</table>
+<p>MLA 做的是 latent-dim 压缩 + 多头展开；V4 做的是 sequence-dim 压缩 + shared-head MQA。两件事叠加起来才解释了 10% 的 KV cache 数字。值得一提的是 <strong>DSA 被保留了</strong>，作为 CSA 内部的稀疏选择步骤，而不是被抛弃。</p>
+<h3 id="csa">CSA<a class="headerlink" href="#csa" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TB
+  subgraph Q_IN["Query Token 输入"]
+    HT["Query hidden h_t ∈ R^d"]
+  end
+  subgraph KV_IN["KV Tokens 输入"]
+    H["KV hidden H ∈ R^(n×d)"]
+  end
+
+  HT --&gt; DQ["low-rank query latent&lt;br/&gt;c_t^Q = h_t · W^DQ ∈ R^(d_c)"]
+
+  subgraph COMP["KV 压缩（Token-Level Compressor，每 2m 个 token overlap 聚合为 n/m 个 entry）"]
+    H --&gt; CAB["C^a = H·W^(aKV)&lt;br/&gt;C^b = H·W^(bKV)&lt;br/&gt;∈ R^(n×c)"]
+    H --&gt; ZAB["Z^a = H·W^(aZ)&lt;br/&gt;Z^b = H·W^(bZ)&lt;br/&gt;(softmax weights)"]
+    CAB --&gt; CCOMP["Compressed KV&lt;br/&gt;C^Comp ∈ R^(n/m × c)"]
+    ZAB --&gt; CCOMP
+  end
+
+  subgraph IDX["Lightning Indexer（稀疏 top-k 选择，FP4 attention）"]
+    H --&gt; KIC["Indexer keys K^IComp ∈ R^(n/m × c_I)&lt;br/&gt;(同 Compressor 结构，不同参数)"]
+    DQ --&gt; IQ["Indexer queries&lt;br/&gt;q^I_t = c_t^Q · W^IUQ"]
+    HT --&gt; IW["Per-head weights&lt;br/&gt;w_t^I = h_t · W^w"]
+    IQ --&gt; SCORE["Index score&lt;br/&gt;I_t,s = Σ_h w·ReLU(q·K)"]
+    KIC --&gt; SCORE
+    IW --&gt; SCORE
+    SCORE --&gt; TOPK["Top-k Selector"]
+    CCOMP --&gt; TOPK
+    TOPK --&gt; SPRS["C^SprsComp_t&lt;br/&gt;(top-k 压缩 KV entries)"]
+  end
+
+  subgraph SW["Sliding Window 支路"]
+    H --&gt; SLIDE["最近 n_win 个未压缩 KV"]
+  end
+
+  subgraph CORE["Shared-KV MQA (核心 attention)"]
+    DQ --&gt; MHQ["Attention queries&lt;br/&gt;q_t = c_t^Q · W^UQ"]
+    MHQ --&gt; CA["CoreAttn(q_t,&lt;br/&gt;KV = C^SprsComp_t ⊕ SlidingWindow)"]
+    SPRS --&gt; CA
+    SLIDE --&gt; CA
+    CA --&gt; GOP["Grouped Output Projection&lt;br/&gt;→ R^d"]
+    GOP --&gt; OUT["attention output o_t"]
+  end
+
+  classDef kv fill:#e8f4fd,stroke:#1a5490;
+  classDef idx fill:#ffe8d6,stroke:#b85c1a;
+  classDef attn fill:#d4f1c5,stroke:#3a7a3a;
+  classDef latent fill:#fff4cc,stroke:#c9a227;
+  class CCOMP kv;
+  class SPRS,TOPK idx;
+  class CA,GOP,OUT attn;
+  class DQ latent;</code></pre>
+<p class="figcaption">图 2-3 CSA 核心数据流：压缩路径 + Lightning Indexer 稀疏选择 + Sliding Window 三路汇入 Shared-KV MQA</p>
+<p>CSA 有三条并行路径，最后汇入同一个 core attention：</p>
+<p><strong>KV 压缩路径</strong>。输入 hidden 矩阵 <code>H ∈ R^(n×d)</code>。用两组独立可学习投影得到 <code>C^a, C^b ∈ R^(n×c)</code> 作为 value、<code>Z^a, Z^b</code> 作为 softmax 权重。然后每 <code>2m</code> 个 token 的 entries 做 softmax-weighted 聚合成 1 个 compressed entry（相邻块的 <code>C^b</code> 和 <code>C^a</code> index 有 overlap）：</p>
+<div class="arithmatex">\[S^a_{m_i:m_{i+1}-1}; S^b_{m_{i-1}:m_i-1} = \text{Softmax}_{\text{row}}([Z^a_{m_i:m_{i+1}-1} + B^a;\ Z^b_{m_{i-1}:m_i-1} + B^b])\]</div>
+<div class="arithmatex">\[C^{\text{Comp}}_i = \sum S^a_j \odot C^a_j + \sum S^b_j \odot C^b_j\]</div>
+<p>序列维度从 <code>n</code> 压到 <code>n/m</code>。</p>
+<p><strong>Lightning Indexer 路径</strong>。对同样的 <code>H</code> 用第二套压缩参数得到 indexer keys <code>K^{IComp} ∈ R^(n/m × c_I)</code>。查询侧做一次低秩投影 <code>c_t^Q = h_t · W^{DQ} ∈ R^{d_c}</code>（这是 V4 里唯一残留的 MLA 风格 latent 压缩，<strong>只用在 query 侧、只在 indexer 内部</strong>）。从 <code>c_t^Q</code> 生成 <code>n_h^I</code> 个 indexer queries 和一组 per-head 权重 <code>w_t^I</code>。打分公式：</p>
+<div class="arithmatex">\[I_{t,s} = \sum_{h=1}^{n_h^I} w^I_{t,h} \cdot \text{ReLU}(q^I_{t,h} \cdot K^{IComp}_s)\]</div>
+<p>按 <code>I_{t,·}</code> 选 top-k compressed entries，作为 <code>C^{\text{SprsComp}}_t</code> 交给后面的 core attention。</p>
+<p><strong>Sliding Window 支路</strong>。最近 <code>n_win</code> 个 token 保持未压缩，直接并入 core attention 的 KV，保住局部精度。</p>
+<p>三路汇入 <strong>Shared-KV MQA</strong>：从同一个 <code>c_t^Q</code> 产生 <code>n_h</code> 个 query head（<code>q_t = c_t^Q · W^{UQ}</code>），和 <code>C^{\text{SprsComp}}_t ⊕ SlidingWindow</code> 做 attention。输出走 <strong>Grouped Output Projection</strong> 回到 <code>R^d</code>——先把 <code>n_h</code> 个 head 切成 <code>g</code> 组，每组投到 <code>d_g &lt; c · n_h / g</code> 维，最后 concat 投回 hidden size。</p>
+<p>整个过程有几处设计值得单独记一下。<code>c_t^Q</code> 这个 query latent <strong>同时被 Lightning Indexer 和 Core Attention 两处共享</strong>，少做一次 down-projection。Indexer 的 <code>K^{IComp}</code> 和 KV 的 <code>C^{Comp}</code> 用的是同样的 compression 操作，但参数独立；<strong>Indexer 的 attention 计算全跑 FP4</strong>，index scores 从 FP32 降到 BF16，top-k 选择器 2× 加速且保持 99.7% recall。Core attention 的 K 和 V 是同一份 <code>C^{\text{SprsComp}}_t</code>（MQA 共享），只有 query 多头。</p>
+<h3 id="hca">HCA<a class="headerlink" href="#hca" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>graph TB
+  HT2["Query h_t ∈ R^d"] --&gt; DQ2["c_t^Q = h_t · W^DQ"]
+  H2["KV H ∈ R^(n×d)"] --&gt; CZ2["C = H·W^KV, Z = H·W^Z&lt;br/&gt;∈ R^(n×c)"]
+
+  subgraph HEAVY["KV 重压缩 (每 m' ≫ m 个 token → 1 entry)"]
+    CZ2 --&gt; CCOMP2["C^Comp ∈ R^(n/m' × c)"]
+  end
+
+  H2 --&gt; SW2["Sliding Window KV&lt;br/&gt;(最近 n_win 个未压缩)"]
+
+  subgraph CORE2["Shared-KV MQA (dense over compressed)"]
+    DQ2 --&gt; MHQ2["q_t = c_t^Q · W^UQ"]
+    MHQ2 --&gt; CA2["CoreAttn(q_t,&lt;br/&gt;KV = C^Comp ⊕ SlidingWindow)"]
+    CCOMP2 --&gt; CA2
+    SW2 --&gt; CA2
+    CA2 --&gt; GOP2["Grouped Output Projection"]
+    GOP2 --&gt; OUT2["o_t ∈ R^d"]
+  end
+
+  classDef kv fill:#e8f4fd,stroke:#1a5490;
+  classDef attn fill:#d4f1c5,stroke:#3a7a3a;
+  classDef latent fill:#fff4cc,stroke:#c9a227;
+  class CCOMP2 kv;
+  class CA2,GOP2,OUT2 attn;
+  class DQ2 latent;</code></pre>
+<p class="figcaption">图 2-4 HCA 核心数据流：同样的压缩结构，但压缩比更激进、去掉 Lightning Indexer、去掉 top-k，直接 dense attention on compressed KV</p>
+<p>HCA 的压缩机制和 CSA 同构，只是 <code>m' ≫ m</code>（比如 CSA 压 8 倍、HCA 压 64 倍）——压得更狠。压完之后<strong>不做稀疏选择</strong>，query 直接对全部 compressed entries 做 dense attention。Shared-KV MQA、Sliding Window 支路、Grouped Output Projection 都保留。</p>
+<h3 id="_2">其他组件<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>几个没单独画在图里但都在 attention 里同时起作用的小部件：</p>
+<p><strong>Partial RoPE</strong>。只在 <code>c</code> 维度的最后 64 维应用 RoPE。由于 KV entries 同时当 key 和 value 用，naïve 实现里 attention output 里会带上"绝对位置"，论文的做法是额外对 output 每一头的最后 64 维也应用位置 <code>-i</code> 的 RoPE，这样 output 最终带的是"相对位置"信息。</p>
+<p><strong>Additional Sliding Window Attention</strong>。前面提到了，每个 query 除了 attend top-k compressed entries 外，还 attend 最近 <code>n_win</code> 个未压缩 token。目的是保证 causality 严格成立（query 不能看到同 compressed block 内其它 token），也保留近邻依赖。</p>
+<p><strong>Attention Sink</strong>。参考 Xiao et al. 2024，为每个 head 设一组可学习 sink logits <code>{z'_1, ..., z'_{n_h}}</code>，加到 softmax 分母里，让 attention scores 可以不归一化到 1（甚至接近 0）。训练更稳。</p>
+<p><strong>Query / KV Entry RMSNorm</strong>。对 query 每个 head、KV entry 唯一那份头，attention 前各做一次 RMSNorm。这一步配合前面的 sink，<strong>替代了 Kimi K2 里的 QK-Clip 技巧</strong>——不需要再单独做。</p>
+<h3 id="hybrid-attention_1">Hybrid Attention 小结<a class="headerlink" href="#hybrid-attention_1" title="Permanent link">&para;</a></h3>
+<p>效率数字汇总（Tech Report Section 2.3.4）：</p>
+<table>
+<thead>
+<tr>
+<th>基线</th>
+<th>V4-Pro</th>
+<th>V4-Flash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BF16 GQA8 (head dim 128)</td>
+<td>~2% of baseline KV cache</td>
+<td>~2% of baseline KV cache</td>
+</tr>
+<tr>
+<td>DeepSeek-V3.2</td>
+<td>27% 单 token FLOPs · 10% KV cache</td>
+<td>10% 单 token FLOPs · 7% KV cache</td>
+</tr>
+</tbody>
+</table>
+<p>Indexer 的 attention 跑 FP4；CSA / HCA 的 core attention 用 <strong>BF16 处理 RoPE 维度 + FP8 处理其余维度</strong>的混合存储格式，KV footprint 比纯 BF16 再降一半。</p>
+<p>这一套组合拳 + mHC 的稳定性 + Muon 的训练效率，让 V4 series 能原生支持 1M token 上下文 serving——而不是只是"benchmark 能跑"。</p>
+<h2 id="mhc">mHC<a class="headerlink" href="#mhc" title="Permanent link">&para;</a></h2>
+<p>mHC（Manifold-Constrained Hyper-Connections）是 V4 替代标准残差的结构。来源是梁文锋 2026/1 合作的 arXiv paper（Xie et al., 2026，arXiv 2512.24880）。V4 是它在旗舰模型上的首次大规模落地。</p>
+<p><strong>标准 HC</strong>（Zhu et al. 2025）把 residual stream 的宽度从 <code>d</code> 扩到 <code>n_hc × d</code>，用三个线性映射 <code>(A, B, C)</code> 代替原本的恒等残差。这样每层对 residual 的读写都可以有独立的"通道选择"，理论上模型容量更大。但深层堆叠时训练不稳定——没有约束的 <code>B</code> 矩阵一旦奇异值超过 1，forward / backward 都会爆。</p>
+<p><strong>mHC 的做法</strong>是把 <code>B_l</code> 约束到<strong>双随机矩阵流形</strong>（Birkhoff polytope）：</p>
+<div class="arithmatex">\[\mathcal{M} := \{M \in \mathbb{R}^{n \times n} \mid M\mathbf{1}_n = \mathbf{1}_n,\ \mathbf{1}_n^T M = \mathbf{1}_n^T,\ M \geq 0\}\]</div>
+<p>落在 <code>M</code> 上的矩阵谱范数必然 <code>≤ 1</code>，forward / backward 都是"非扩张"的。多层堆叠不会发散。工程实现用 <strong>Sinkhorn-Knopp 迭代</strong>（20 次）投影到流形；输入 / 输出映射 <code>A, C</code> 用 Sigmoid 约束到非负有界。三个映射的参数本身被进一步分解成 <strong>dynamic（输入相关） + static（固定 bias）两部分</strong>动态生成。</p>
+<p>mHC 在 V4 里带来的额外 wall-time 开销约 6.7%（详见姊妹篇的训练框架优化部分）。</p>
+<h2 id="muon">Muon 优化器<a class="headerlink" href="#muon" title="Permanent link">&para;</a></h2>
+<p>Muon 这次是旗舰 MoE 训练线第一次用上。来源要讲清楚：</p>
+<p><strong>原始版本</strong>由 Keller Jordan 2024 提出（一个 short paper），核心是对矩阵参数用 Newton-Schulz 迭代近似做正交化、然后按 SGD-like 规则更新。</p>
+<p><strong>LLM-scale 版本</strong>是月之暗面（Moonshot / Kimi 团队）Liu et al. 2025 做的（arXiv 2502.16982）：加了 weight decay、Nesterov trick、update 的 RMS rescaling 等工程化改动，让 Muon 能用在 trillion 级训练，Kimi K2 是第一个 production 样本。</p>
+<p><strong>V4 的增量</strong>是自定义的 <strong>Hybrid Newton-Schulz 系数方案</strong>。10 次迭代，分两段：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>步数</th>
+<th>系数 (a, b, c)</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前段</td>
+<td>8</td>
+<td>(3.4445, −4.7750, 2.0315)</td>
+<td>aggressive，把 singular values 快速拉近 1</td>
+</tr>
+<tr>
+<td>后段</td>
+<td>2</td>
+<td>(2, −1.5, 0.5)</td>
+<td>stabilize，精确锁定到 1</td>
+</tr>
+</tbody>
+</table>
+<p>V4 里的具体配置：AdamW 保留给 embedding、prediction head、mHC 的 static bias / gating、RMSNorm；<strong>其余所有模块用 Muon</strong>。由于 attention 里 query 和 KV entry 都已经做了 RMSNorm，<strong>不需要 QK-Clip</strong>（Kimi K2 里的那个 trick）。</p>
+<p>训练栈迁移上，Megatron-LM / NeMo 如果要复现 V4，要加 Muon 实现——Kimi 团队的开源版本可以作为参考。</p>
+<h2 id="moe">MoE 调整<a class="headerlink" href="#moe" title="Permanent link">&para;</a></h2>
+<p>V4 仍用 DeepSeekMoE（fine-grained routed experts + shared experts 的组合），但对 V3 做了几处调整：</p>
+<ul>
+<li>affinity score 的激活函数从 Sigmoid 换成 <strong>Sqrt(Softplus)</strong></li>
+<li>保留 auxiliary-loss-free 负载均衡，加一个轻量 sequence-wise balance loss 防单序列内部极端不平衡</li>
+<li><strong>移除"每 token 路由目标节点数量上限"</strong>，重新设计并行策略保证训练效率</li>
+<li><strong>前若干层原来的 dense FFN 替换成用 Hash routing 的 MoE 层</strong></li>
+</ul>
+<p>最后一条单独展开。</p>
+<h3 id="hash-routing">Hash routing<a class="headerlink" href="#hash-routing" title="Permanent link">&para;</a></h3>
+<p>Hash routing 来自 Meta AI 的 Roller et al. 2021，《Hash Layers for Large Sparse Models》。核心思想是用<strong>固定的 hash 函数</strong>代替学习的 router，按 token ID 静态分配专家：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>token &quot;cat&quot; (id=1234) → hash(1234) → expert 5
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>token &quot;dog&quot; (id=9876) → hash(9876) → expert 2
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>token &quot;cat&quot; (id=1234) → hash(1234) → expert 5   # 相同 token 恒去同一 expert
 </span></code></pre></div>
-<p>端到端延迟预算方程：</p>
-<div class="arithmatex">\[T = \text{SLO} \times L_{\text{accept}} = t_g + N_{\text{layers}} \times N_{BO} \times t_B\]</div>
+<p>和常见路由方式相比：</p>
+<table>
+<thead>
+<tr>
+<th>路由方式</th>
+<th>分配依据</th>
+<th>路由参数</th>
+<th>负载均衡</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top-k gating (Switch / Mixtral)</td>
+<td>router 网络对 embedding 打分</td>
+<td>router MLP</td>
+<td>靠 auxiliary loss</td>
+</tr>
+<tr>
+<td>DeepSeekMoE (V2/V3) auxiliary-loss-free</td>
+<td>学习 + bias 更新做均衡</td>
+<td>router + bias</td>
+<td>无显式 loss</td>
+</tr>
+<tr>
+<td>Hash routing</td>
+<td>hash(token_id) mod N</td>
+<td><strong>无 router</strong></td>
+<td>好 hash 天然均衡</td>
+</tr>
+</tbody>
+</table>
+<p>Hash routing 的优点是<strong>完全确定性</strong>、零 router 参数、训练第一步就稳；缺点也明显——静态分配不看 context，相同 token 在不同语境下不会分给不同 expert，特化能力有限。</p>
+<p>V4 的策略是<strong>深度方向的路由异构</strong>：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Block 1..k :   MoE with Hash routing        ← 静态、per-token-id、轻量
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Block k+1..L:  DeepSeekMoE (auxiliary-loss-free)  ← 动态、context-aware
+</span></code></pre></div>
+<p>直觉上讲得通：前几层本就偏 token-level 特征化，接近 embedding lookup 的延续，context 依赖不强，hash 分配够用；到中后层 token 已携带足够 context，才需要学习式路由做专家特化。这个思路和 attention 层"按层选 CSA 还是 HCA"的异构策略完全一致——V4 对"不同层不同需求"这件事很放得开。</p>
+<h2 id="fp4-fp8">FP4 + FP8 混合精度训练<a class="headerlink" href="#fp4-fp8" title="Permanent link">&para;</a></h2>
+<p>V4 的 FP4 不是"推理量化"，是 training-aware 的真 FP4。</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>精度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V4-*-Base</td>
+<td>FP8 mixed</td>
+</tr>
+<tr>
+<td>V4-* (Instruct)</td>
+<td><strong>FP4 + FP8 mixed</strong>：MoE expert 参数 + CSA Indexer QK 路径跑 FP4，其余 FP8</td>
+</tr>
+</tbody>
+</table>
+<p>这是旗舰级 MoE 第一次把 expert 权重降到 FP4 训练 + 存储。SGLang day-0 PR 里的 quantizer 文件叫 <code>mxfp4_deepseek.py</code>，<strong>用的是 MXFP4（开放标准），不是 NVFP4</strong>。</p>
+<p>一个容易被忽视的关键 trick：<strong>FP4 → FP8 dequantization 是无损的</strong>（Tech Report Section 3.4）。原因是 FP8（E4M3）比 FP4（E2M1）多 2 个 exponent bits，只要 FP4 sub-block（1 × 32 tiles）内的 scale factor 动态范围不超过 FP8 的动态范围，fine-grained scale 信息可以完全被 FP8 吸收。经验证当前训练权重满足这个条件。</p>
+<p>这个 trick 对 Hopper 是好消息：V4 的 FP4 权重在 H100/H200 上 dequant 到 FP8 不丢精度，<strong>存储还是 FP4 的空间开销</strong>（memory traffic 省一半），算力走 FP8 Tensor Core。Hopper 代差没有想象中那么大——只在 FP4 原生 compute 密集场景才拉开，memory-bound 场景两代差别很小。</p>
+<h2 id="post-training">训练数据与 Post-training<a class="headerlink" href="#post-training" title="Permanent link">&para;</a></h2>
+<p>V4-Pro 33T tokens、V4-Flash 32T tokens，大约是 V3（14.8T）和 V3.2（16–18T）的两倍。</p>
+<p>Post-training 从 V3.2 的 "mixed RL" 改成了两阶段范式：</p>
+<p><strong>Specialist Training</strong>：每个目标领域（math、code、agent、instruction-following 等 10+ 个）独立训练 expert，Base 模型先 SFT 再跑 RL（GRPO）。</p>
+<p><strong>On-Policy Distillation (OPD)</strong>：用上述 specialists 作为 teachers，让一个 unified student 在 on-policy 采样的 trajectory 上学 multi-teacher KL：</p>
+<div class="arithmatex">\[\mathcal{L}_{\text{OPD}}(\theta) = \sum_{i=1}^{N} w_i \cdot D_{\text{KL}}(\pi_\theta \| \pi_{E_i})\]</div>
+<p>用的是 <strong>full-vocabulary logit distillation</strong>（不是 token-level KL 估计），variance 低、更稳。10+ teachers → 1 unified student。</p>
+<p>Post-training 的工程基础设施（teacher scheduling、preemptible rollout、DSec sandbox）全部放在姊妹篇。</p>
+<h2 id="v32-v4">V3.2 → V4 对比<a class="headerlink" href="#v32-v4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>V3.2</th>
+<th>V4-Pro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>总参</td>
+<td>671B</td>
+<td>1.6T</td>
+</tr>
+<tr>
+<td>激活</td>
+<td>37B</td>
+<td>49B</td>
+</tr>
+<tr>
+<td>上下文</td>
+<td>128K (可扩 1M)</td>
+<td>1M 原生</td>
+</tr>
+<tr>
+<td>KV 压缩轴</td>
+<td>latent 维（MLA）</td>
+<td>sequence 维（CSA / HCA）</td>
+</tr>
+<tr>
+<td>Core attention</td>
+<td>Multi-head (MLA)</td>
+<td>Shared-KV MQA</td>
+</tr>
+<tr>
+<td>稀疏选择</td>
+<td>DSA</td>
+<td>DSA（保留，嵌入 CSA 内）</td>
+</tr>
+<tr>
+<td>残差</td>
+<td>标准</td>
+<td>mHC</td>
+</tr>
+<tr>
+<td>优化器</td>
+<td>AdamW 变体</td>
+<td>Muon（+ AdamW for embed / norm）</td>
+</tr>
+<tr>
+<td>训练精度</td>
+<td>FP8 mixed</td>
+<td>FP4 + FP8 mixed</td>
+</tr>
+<tr>
+<td>训练 tokens</td>
+<td>~16–18T</td>
+<td>Pro 33T · Flash 32T</td>
+</tr>
+<tr>
+<td>KV cache @ 1M (vs V3.2)</td>
+<td>基线</td>
+<td>10% (Pro) · 7% (Flash)</td>
+</tr>
+<tr>
+<td>推理 FLOPs @ 1M (vs V3.2)</td>
+<td>基线</td>
+<td>27% (Pro) · 10% (Flash)</td>
+</tr>
+<tr>
+<td>MTP</td>
+<td>保留</td>
+<td>保留</td>
+</tr>
+<tr>
+<td>MoE 框架</td>
+<td>DeepSeekMoE</td>
+<td>DeepSeekMoE + 前几层 Hash routing</td>
+</tr>
+</tbody>
+</table>
+<h2 id="benchmark">Benchmark<a class="headerlink" href="#benchmark" title="Permanent link">&para;</a></h2>
+<p>核心是 Tech Report Table 6 / Table 7 两张表。完整的 benchmark setup、MRCR 长上下文曲线、Terminal Bench、white-collar / Chinese writing 真实任务评测在姊妹篇。这里只给两组对比。</p>
+<p><strong>Base 模型 (DeepSeek-V4-Pro-Base)</strong></p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>Benchmark</th>
+<th>V4-Pro-Base</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>世界知识</td>
+<td>MMLU (5-shot)</td>
+<td>90.1</td>
+</tr>
+<tr>
+<td></td>
+<td>MMLU-Pro (5-shot)</td>
+<td>73.5</td>
+</tr>
+<tr>
+<td></td>
+<td>C-Eval (5-shot)</td>
+<td>93.1</td>
+</tr>
+<tr>
+<td>代码 &amp; 数学</td>
+<td>HumanEval (0-shot)</td>
+<td>76.8</td>
+</tr>
+<tr>
+<td></td>
+<td>GSM8K (8-shot)</td>
+<td>92.6</td>
+</tr>
+<tr>
+<td></td>
+<td>MATH (4-shot)</td>
+<td>64.5</td>
+</tr>
+<tr>
+<td>长上下文</td>
+<td>LongBench-V2</td>
+<td>51.5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Instruct 模型 V4-Pro Max vs Frontier</strong></p>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Opus-4.6 Max</th>
+<th>GPT-5.4 xHigh</th>
+<th>Gemini-3.1-Pro High</th>
+<th>DS-V4-Pro Max</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMLU-Pro</td>
+<td>89.1</td>
+<td>87.5</td>
+<td><strong>91.0</strong></td>
+<td>87.5</td>
+</tr>
+<tr>
+<td>SimpleQA-Verified</td>
+<td>46.2</td>
+<td>45.3</td>
+<td><strong>75.6</strong></td>
+<td>57.9</td>
+</tr>
+<tr>
+<td>GPQA Diamond</td>
+<td>91.3</td>
+<td>93.0</td>
+<td><strong>94.3</strong></td>
+<td>90.1</td>
+</tr>
+<tr>
+<td>HLE</td>
+<td>40.0</td>
+<td>39.8</td>
+<td><strong>44.4</strong></td>
+<td>37.7</td>
+</tr>
+<tr>
+<td>LiveCodeBench</td>
+<td>88.8</td>
+<td>—</td>
+<td>91.7</td>
+<td><strong>93.5</strong></td>
+</tr>
+<tr>
+<td>Codeforces</td>
+<td>—</td>
+<td>3168</td>
+<td>3052</td>
+<td><strong>3206</strong></td>
+</tr>
+<tr>
+<td>SWE Verified</td>
+<td><strong>80.8</strong></td>
+<td>—</td>
+<td>80.6</td>
+<td>80.6</td>
+</tr>
+<tr>
+<td>MRCR 1M</td>
+<td><strong>92.9</strong></td>
+<td>—</td>
+<td>76.3</td>
+<td>83.5</td>
+</tr>
+</tbody>
+</table>
+<p>Codeforces 3206 / LiveCodeBench 93.5 是开源第一；SWE Verified 80.6 和 Opus-4.6 Max 并列 SOTA。但 MMLU-Pro / GPQA / HLE 几项世界知识输 Gemini-3.1-Pro 一截，SimpleQA 差距最大。Tech Report 自己对此的总结很坦诚："trails state-of-the-art frontier models by approximately 3 to 6 months"。</p>
+<h2 id="_3">部署视角的几个快速判断<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>写给做 inference infra 的人看的几条早期结论，随着社区实测和 TRT-LLM / vLLM 的 day-0 PR 会继续修正：</p>
 <ul>
-<li><code>T</code>：单 batch 端到端延迟</li>
-<li><code>SLO</code>：每 token 输出目标时延（TPOT SLA）</li>
-<li><code>L_accept</code>：MTP 平均接受长度</li>
-<li><code>t_g</code>：inter-batch gap（CUDA Graph 启动、边界同步等）</li>
-<li><code>N_layers</code>：层数</li>
-<li><code>N_BO = 3</code>：overlap 度</li>
-<li><code>t_B</code>：每层每 batch 允许的 wall time 预算</li>
+<li><strong>KV cache 10%</strong> 是对长上下文服务经济性的分水岭。在做 PD 分离 / KV mover 带宽预算的队伍，应该重跑一遍 trade-off 曲线——V3.2 时代的一些边际优化在 V4 下可能变成决定性的，反过来也有。</li>
+<li><strong>Hopper 和 Blackwell 的代差没有想象中大</strong>。FP4 → FP8 无损 dequant 让 H100 / H200 在 memory-bound 场景下吃到 V4 的大部分收益，只有 FP4 原生 compute 密集场景 B200 才真拉开。</li>
+<li><strong>SGLang day-0 支持很完整</strong>。<a href="https://github.com/sgl-project/sglang/pull/23600">sgl-project/sglang#23600</a> 2026-04-24 同日开 PR，包含 CSA / HCA 的 CUDA kernel、MXFP4 quantizer、MTP nextN 头、NPU 路径。文件清单里 <code>deepseek_v4_backend_radix.py</code> 的命名说明走的是 RadixAttention 变种而不是 PagedAttention——原因在姊妹篇。</li>
+<li><strong>Huawei Ascend 950PR 独享早期硬件通路</strong>（Reuters 4/3 报道）。SGLang PR 里带 <code>npu</code> 标签印证了这一点——day-0 优化可能是 Ascend 先到，NV 侧靠开源社区回补。</li>
 </ul>
-<p>3BO 无气泡的硬约束：</p>
-<div class="arithmatex">\[\max(t_a, t_f, t_c) \le t_B\]</div>
-<div class="arithmatex">\[2 t_a \ge t_f + t_c, \quad 2 t_f \ge t_a + t_c\]</div>
-<p><code>t_a, t_f, t_c</code> 分别是 Attention、FFN、通信的 per-layer 延迟，最优运行点是 <code>t_a, t_f → t_B</code>。</p>
-<h2 id="s_t-ofu-hfu">三层利用率：S_t · OFU · HFU<a class="headerlink" href="#s_t-ofu-hfu" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>指标</th>
-<th>定义</th>
-<th>物理意义</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Temporal Sparsity <code>S_t</code></td>
-<td><code>S_t = t_G / t_B</code></td>
-<td>算子活跃时间占预算的比例</td>
-</tr>
-<tr>
-<td>Operator FLOPS Utilization <code>OFU</code></td>
-<td><code>OFU = FLOPs / t_G</code></td>
-<td>算子自身算力利用率</td>
-</tr>
-<tr>
-<td>Hardware FLOPS Utilization <code>HFU</code></td>
-<td><code>HFU = FLOPs / t_B = OFU × S_t</code></td>
-<td>硬件整体算力利用率</td>
-</tr>
-</tbody>
-</table>
-<p>这个拆分是后面所有分析的基础。<strong>AFD 的 FFN 预算 <code>t_B</code> 被 SLO 死死限制</strong>——即使 OFU 很高，若 <code>S_t</code> 低（算子没占满预算），HFU 仍然上不去。</p>
-<h2 id="budget-based-hfu-dead-zone">Budget-Based HFU 与 dead zone<a class="headerlink" href="#budget-based-hfu-dead-zone" title="Permanent link">&para;</a></h2>
-<p>MoE stage 的算术强度：</p>
-<div class="arithmatex">\[I = \frac{2 B_{\text{rank}}}{\lceil N_{\text{experts}} / (N_F \cdot g) \rceil}\]</div>
+<h2 id="_4">还没覆盖的<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Tech Report Section 3（General Infrastructures）和 Section 5.2（RL / OPD Infra）的全部内容，Section 6 的 conclusion，都在 <a href="../2026-04-24-deepseek-v4-infra/">DeepSeek-V4 基础设施拆解</a>。</p>
+<p>Section 4（Pre-Training：data construction、pre-training setup、mitigating instability）两篇都还没读进来。训练数据细节和稳定性救治的具体 recipe（包括 Tech Report 里承认"原理未明"的 Anticipatory Routing 和 SwiGLU Clamping）是下一步要补的。</p>
+<h2 id="_5">相关链接<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>一手：</p>
 <ul>
-<li><code>B_rank</code>：每个 FFN rank 收到的 token 数</li>
-<li><code>N_experts</code>：总专家数</li>
-<li><code>N_F</code>：FFN 节点数</li>
-<li><code>g</code>：组内专家聚合因子</li>
+<li><a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/resolve/main/DeepSeek_V4.pdf">Tech Report PDF</a> —— DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence</li>
+<li>HF model cards：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro">V4-Pro</a> · <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash">V4-Flash</a> · <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro-Base">V4-Pro-Base</a> · <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash-Base">V4-Flash-Base</a></li>
+<li>参考推理实现：<a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro/tree/main/inference"><code>DeepSeek-V4-Pro/tree/main/inference</code></a></li>
 </ul>
-<p>带宽约束下的 <code>B_rank</code>：</p>
-<div class="arithmatex">\[B_{\text{rank}} = \min\left(B_{\text{ScaleOut}} \cdot \max\left(1, \frac{\text{TopK}}{N_F}\right),\ B_{\text{ScaleUp}}\right)\]</div>
-<p><code>B_ScaleOut</code> 是跨节点（比如 H800 RDMA）单 rank 带宽，<code>B_ScaleUp</code> 是节点内（比如 NVLink）单 rank 带宽。随 <code>N_F</code> 增长系统会经过四个区间：scale-up bound（NVLink 饱和）→ stable intensity（算术强度随 N_F 增长）→ <strong>scale-out bound（dead zone）</strong>→ maximum intensity。</p>
-<p><strong>Dead zone</strong> 的形式化表达：当系统进入 scale-out bound，</p>
-<div class="arithmatex">\[\text{HFU} = \frac{2 \cdot B_{\text{ScaleUp}} \cdot M}{\text{FLOPS}}\]</div>
-<p><code>M</code> 是 expert intermediate size。这个 HFU 只取决于 <strong>M 和硬件 FLOPS 之比</strong>，和 <code>N_F</code> 无关。<strong>增加 FFN 节点数无法提升 HFU</strong>。这就是论文指出的 H800 上 DeepSeek-V3 HFU 被封顶在 ~33% 的根本原因。</p>
-<h2 id="afd">不均衡敏感性：AFD 的阿喀琉斯之踵<a class="headerlink" href="#afd" title="Permanent link">&para;</a></h2>
-<p><strong>DP 不均衡</strong>。起因是 DP ranks 间 context length 不均，某些 rank 的 batch 只有 <code>σ·B</code>（σ ≤ 1）。</p>
-<table>
-<thead>
-<tr>
-<th>架构</th>
-<th>吞吐恢复系数</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Large-Scale EP</td>
-<td><code>α_EP &gt; σ</code>（可通过增大 batch 回收 FFN 释放的时延）</td>
-</tr>
-<tr>
-<td>AFD</td>
-<td><code>α_AFD = σ</code>（固定预算 t_B 不允许 batch 回填）</td>
-</tr>
-</tbody>
-</table>
-<p>AFD <strong>完全承担 σ 的损失</strong>，无法像 EP 那样部分恢复。</p>
-<p><strong>EP 不均衡</strong>。起因是 MoE 路由不均，某些 expert 的 token 数变化。</p>
-<p>Large-Scale EP 的惩罚：</p>
-<div class="arithmatex">\[\alpha_{EP} = \frac{\lambda_{EP} + 1}{\lambda_{EP} + 1/\sigma} &gt; \sigma\]</div>
-<p><code>λ_EP = t_a / t_f</code>，通常在 [2, 4]。</p>
-<p>AFD 连续近似：</p>
-<div class="arithmatex">\[\alpha_{\text{exact}} = \frac{\lambda_{AFD} + 1}{\lambda_{AFD} + 1/\sigma} &gt; \sigma\]</div>
-<p><code>λ_AFD = N_A / N_F</code>。但 AFD 的实际扩容是节点级离散的，多一个 quantization 损失：</p>
-<div class="arithmatex">\[\alpha_{\text{floor}} = \frac{(\lambda_{AFD} + 1) \lfloor \sigma N_A \rfloor}{\lfloor \sigma N_A \rfloor + N_F}\]</div>
-<div class="arithmatex">\[\alpha_{\text{ceil}} = \frac{(\lambda_{AFD} + 1) \lceil \sigma N_A \rceil}{\lceil \sigma N_A \rceil + N_F} \cdot \frac{\sigma N_A}{\lceil \sigma N_A \rceil}\]</div>
-<p>即使 FFN 激进优化（<code>λ = 5</code>），<strong>AFD 要到 σ = 0.8 才勉强追上 EP</strong>，大多数现实不均衡水平下 AFD 劣于 EP。</p>
-<h2 id="_1">硬件 × 模型矩阵<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>假设 <code>L_accept = 1.7, t_g = 15 ms</code>，各 GPU × 模型组合的理论 HFU 上界（%）：</p>
-<table>
-<thead>
-<tr>
-<th>GPU</th>
-<th>DeepSeek-V3</th>
-<th>Kimi-K2</th>
-<th>Step3</th>
-<th>Qwen3-Coder</th>
-<th>ERNIE-4.5</th>
-<th>GLM-4.7</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>H20</td>
-<td>48</td>
-<td>48</td>
-<td>58</td>
-<td>52</td>
-<td>54</td>
-<td>44</td>
-</tr>
-<tr>
-<td>H100</td>
-<td>HBM-limited</td>
-<td>HBM-limited</td>
-<td>34</td>
-<td>37</td>
-<td>36</td>
-<td>30</td>
-</tr>
-<tr>
-<td>H200</td>
-<td>HBM-limited</td>
-<td>HBM-limited</td>
-<td>34</td>
-<td>37</td>
-<td>36</td>
-<td>30</td>
-</tr>
-<tr>
-<td><strong>H800</strong></td>
-<td><strong>33</strong></td>
-<td><strong>33</strong></td>
-<td>40</td>
-<td>36</td>
-<td>38</td>
-<td>31</td>
-</tr>
-<tr>
-<td>B200</td>
-<td>36</td>
-<td>36</td>
-<td>44</td>
-<td>39</td>
-<td>41</td>
-<td>34</td>
-</tr>
-<tr>
-<td>B300</td>
-<td>36</td>
-<td>36</td>
-<td>44</td>
-<td>39</td>
-<td>41</td>
-<td>34</td>
-</tr>
-<tr>
-<td><strong>GB200</strong></td>
-<td><strong>65.5</strong></td>
-<td><strong>65.5</strong></td>
-<td><strong>65.5</strong></td>
-<td>64</td>
-<td>65</td>
-<td>60</td>
-</tr>
-<tr>
-<td><strong>GB300</strong></td>
-<td><strong>65.5</strong></td>
-<td><strong>65.5</strong></td>
-<td><strong>65.5</strong></td>
-<td>64</td>
-<td>65</td>
-<td>60</td>
-</tr>
-</tbody>
-</table>
-<p class="figcaption">表 2-1 AFD 理论 HFU 上界的硬件 × 模型矩阵</p>
-<p>几个结论：</p>
+<p>相关工作：</p>
 <ul>
-<li><strong>标准集群（H800）+ DeepSeek-V3</strong>：AFD 理论 HFU 上限 33.1%，<strong>低于 Large-Scale EP 可达的 ~60%</strong></li>
-<li><strong>Superpod（GB200/GB300）</strong>：HFU 上限 65.5%，AFD 才真正有优势</li>
-<li><strong>H100/H200 + DeepSeek-V3/Kimi-K2</strong>："HBM-limited"，Attention 侧 KV cache 读取就已瓶颈，AFD 无意义</li>
-<li>Step3（M = 5120，粗粒度）天然比 DeepSeek-V3（M = 2048，细粒度）HFU 高</li>
+<li><a href="https://arxiv.org/abs/2502.16982">Muon is scalable for LLM training</a> (Liu et al., Kimi team 2025)</li>
+<li><a href="https://arxiv.org/abs/2512.24880">mHC paper</a> (Xie et al., 2026)</li>
+<li><a href="https://thinkingmachines.ai/blog/on-policy-distillation">On-Policy Distillation</a> (Lu &amp; TM Lab, 2025)</li>
+<li><a href="https://proceedings.neurips.cc/paper/2021/hash/92bf5e6240737e0326ea59846a83e076-Abstract.html">Hash Layers for Large Sparse Models</a> (Roller et al., NeurIPS 2021)</li>
+<li><a href="https://arxiv.org/abs/2512.02556">DeepSeek-V3.2 Tech Report</a> —— 对照版本</li>
 </ul>
-<h2 id="afd-vs">AFD 友好 vs. 不友好<a class="headerlink" href="#afd-vs" title="Permanent link">&para;</a></h2>
-<p><strong>模型层面</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>条件</th>
-<th>AFD 友好</th>
-<th>AFD 不友好</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Expert 中间维度 M</td>
-<td>大（Step3: 5120）</td>
-<td>小（DeepSeek-V3: 2048）</td>
-</tr>
-<tr>
-<td>Expert 稀疏度 N_experts/TopK</td>
-<td>低（Step3: 48/3=16）</td>
-<td>高（DeepSeek-V3: 256/8=32）</td>
-</tr>
-<tr>
-<td>路由方式</td>
-<td>粗粒度</td>
-<td>细粒度</td>
-</tr>
-</tbody>
-</table>
-<p><strong>行业悖论</strong>：当前 MoE 演进趋势恰恰是<strong>更细粒度、更稀疏</strong>（DeepSeek、Kimi、Qwen3），<strong>和 AFD 友好方向相反</strong>。</p>
-<p><strong>硬件层面</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>条件</th>
-<th>AFD 友好</th>
-<th>AFD 不友好</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>拓扑</td>
-<td>Superpod 全互联（GB200/GB300）</td>
-<td>标准 NVLink + RDMA 集群（H800）</td>
-</tr>
-<tr>
-<td>Scale-up 带宽</td>
-<td>充裕（&gt; 600 GB/s）</td>
-<td>有限（NVLink 节点内）</td>
-</tr>
-<tr>
-<td>子节点划分</td>
-<td>灵活（缓解离散扩容惩罚）</td>
-<td>刚性（节点级最小粒度）</td>
-</tr>
-<tr>
-<td>异构资源</td>
-<td>可按 Attn/FFN 差异分配</td>
-<td>同构集群无收益</td>
-</tr>
-</tbody>
-</table>
-<h2 id="afd-vs_1">AFD vs. 其他架构<a class="headerlink" href="#afd-vs_1" title="Permanent link">&para;</a></h2>
-<p><strong>AFD vs. Large-Scale EP</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>AFD</th>
-<th>Large-Scale EP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>扩容粒度</td>
-<td>节点级离散（quantization 损失）</td>
-<td>batch 连续可调</td>
-</tr>
-<tr>
-<td>不均衡恢复</td>
-<td><code>α = σ</code>（完全承担）</td>
-<td><code>α &gt; σ</code>（部分恢复）</td>
-</tr>
-<tr>
-<td>标准集群 HFU 上限</td>
-<td>~33% (H800/DeepSeek-V3)</td>
-<td>~60%</td>
-</tr>
-<tr>
-<td>代码复杂度</td>
-<td>极高（3BO + per-layer 通信 + 紧同步）</td>
-<td>中</td>
-</tr>
-</tbody>
-</table>
-<p><strong>标准集群上 Large-Scale EP 是最佳选择</strong>。</p>
-<p><strong>AFD vs. PD Disaggregation</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>维度</th>
-<th>PD</th>
-<th>AFD</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>分离对象</td>
-<td>Prefill / Decode 阶段</td>
-<td>Attention / FFN 模块</td>
-</tr>
-<tr>
-<td>耦合程度</td>
-<td>松耦合（独立实例）</td>
-<td>紧耦合（每层同步）</td>
-</tr>
-<tr>
-<td>弹性</td>
-<td>灵活</td>
-<td>受 3BO 约束，很脆弱</td>
-</tr>
-<tr>
-<td>Jitter 传播</td>
-<td>阶段间隔离</td>
-<td>跨 Attn/FFN 迅速扩散</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Expert-as-a-Service (EaaS)</strong> 则在小模型（单节点放得下）下更有希望，万亿级 MoE（DeepSeek-V3）受限。</p>
-<h2 id="_2">实现层面的挑战<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>即使选择了 AFD 友好的硬件-模型组合，工程上还是苦：</p>
-<ul>
-<li><strong>CUDA Graph 启动开销</strong>：3BO 下算子数 × 1.5，边界同步成本不可忽略</li>
-<li><strong>小 t_B 预算</strong>：boundary overhead 占比变大</li>
-<li><strong>Layout 转换</strong>：需要额外 shuffle 算子实现 Attn ↔ FFN 的布局互换</li>
-<li><strong>紧同步</strong>：Attn 与 FFN 两阶段必须严格对齐，任何 jitter 快速放大</li>
-</ul>
-<h2 id="afd-challenges">AFD Challenges 小结<a class="headerlink" href="#afd-challenges" title="Permanent link">&para;</a></h2>
-<ul>
-<li>AFD 的理论收益<strong>严重依赖硬件-模型组合</strong>，不是通用优化</li>
-<li>标准集群 + 细粒度 MoE（当前主流）下，AFD HFU 被 scale-out 带宽封顶在 ~33%</li>
-<li>AFD 对 DP/EP 不均衡的容忍度显著低于 Large-Scale EP</li>
-<li>Superpod + 粗粒度 MoE 才是 AFD 用武之地；行业趋势与之相反</li>
-</ul>
-<p>给不同角色的建议：</p>
-<table>
-<thead>
-<tr>
-<th>角色</th>
-<th>建议</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>推理框架开发者</td>
-<td>标准集群上继续投资 Large-Scale EP；AFD 路径谨慎评估 ROI</td>
-</tr>
-<tr>
-<td>基础设施规划</td>
-<td>规划 AFD 必须投资 Superpod 级拓扑（GB200/GB300）</td>
-</tr>
-<tr>
-<td>模型设计</td>
-<td>想未来上 AFD，考虑粗粒度专家（与当前细粒度趋势相反）</td>
-</tr>
-<tr>
-<td>异构部署</td>
-<td>AFD 的价值在异构资源场景：Attention 需大 HBM、FFN 需大算力时可精准分配</td>
-</tr>
-</tbody>
-</table>
-<p>判断 AFD 是否值得的四步决策树：</p>
-<ol>
-<li>硬件是否 Superpod 级？否 → 放弃 AFD，选 Large-Scale EP</li>
-<li>模型是否粗粒度 MoE（M ≥ 5120，稀疏度 ≤ 16）？否 → AFD 收益低</li>
-<li>负载是否均衡（σ &gt; 0.95）？否 → AFD 损失远大于 EP</li>
-<li>是否追求异构资源匹配？是 → AFD 可考虑</li>
-</ol>
-<h2 id="_3">相关链接<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="https://arxiv.org/abs/2602.09721">arXiv:2602.09721</a></li>
-</ul>
+<p>SGLang day-0：<a href="https://github.com/sgl-project/sglang/pull/23600">sgl-project/sglang#23600</a></p>
 <p>KB 内：</p>
 <ul>
-<li><a href="../../09/2026-04-09-afd-optimal-ratio/">AFD Optimal Ratio 闭式解</a></li>
-<li><a href="../../09/2026-04-09-frontier-simulator/">Frontier 仿真器</a></li>
-<li><a href="../../../../../parallelism/">Parallelism →</a></li>
-<li><a href="../../../../../moe/">MoE Systems →</a></li>
+<li>姊妹篇：<a href="../2026-04-24-deepseek-v4-infra/">DeepSeek-V4 基础设施拆解</a></li>
+<li><a href="../../../../../projects/deepep/">DeepEP 项目笔记</a></li>
+<li><a href="../../23/2026-04-23-nccl-gin/">NCCL GIN</a></li>
+<li><a href="../../20/2026-04-20-afd-challenges/">AFD Challenges</a></li>
 </ul>
 
 
@@ -2491,7 +2827,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../09/2026-04-09-afd-optimal-ratio/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2026 04 09 afd optimal ratio">
+          <a href="../../23/2026-04-23-nccl-gin/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 2026 04 23 nccl gin">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2501,20 +2837,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                2026 04 09 afd optimal ratio
+                2026 04 23 nccl gin
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../23/2026-04-23-nccl-gin/" class="md-footer__link md-footer__link--next" aria-label="Next: 2026 04 23 nccl gin">
+          <a href="../2026-04-24-deepseek-v4-infra/" class="md-footer__link md-footer__link--next" aria-label="Next: 2026 04 24 deepseek v4 infra">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                2026 04 23 nccl gin
+                2026 04 24 deepseek v4 infra
               </div>
             </div>
             <div class="md-footer__button md-icon">

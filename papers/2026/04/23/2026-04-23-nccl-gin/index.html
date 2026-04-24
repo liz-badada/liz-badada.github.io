@@ -18,6 +18,8 @@
         <link rel="prev" href="../../20/2026-04-20-afd-challenges/">
       
       
+        <link rel="next" href="../../24/2026-04-24-deepseek-v4/">
+      
       
         
       
@@ -80,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#gpu-initiated-networking-for-nccl-nccl-gin" class="md-skip">
+        <a href="#nccl-gin-device-initiated-rdma-nccl" class="md-skip">
           Skip to content
         </a>
       
@@ -727,6 +729,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -792,6 +798,66 @@
     
   
     communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    large-scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    moe
   
 
     
@@ -1753,10 +1819,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
+  <a href="#tldr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 核心问题
+        TL;DR
       
     </span>
   </a>
@@ -1764,10 +1830,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-nccl-228-device-api" class="md-nav__link">
+  <a href="#device-initiated-rdma" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. NCCL 2.28 Device API 全景
+        为什么需要 device-initiated RDMA
       
     </span>
   </a>
@@ -1775,22 +1841,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-gin" class="md-nav__link">
+  <a href="#nccl-228-device-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. GIN 三层架构
+        NCCL 2.28 Device API 三模式
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="3. GIN 三层架构">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GIN 三层架构
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="GIN 三层架构">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#31-1-nccl-core-host" class="md-nav__link">
+  <a href="#nccl-core-host" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.1 ① NCCL Core — host 侧
+        NCCL Core — host 侧
       
     </span>
   </a>
@@ -1798,33 +1875,60 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#32-2-device-gin-api-gpu-kernel" class="md-nav__link">
+  <a href="#device-gin-api-gpu-kernel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.2 ② Device GIN API — GPU kernel 内调用
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="3.2 ② Device GIN API — GPU kernel 内调用">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Context：网络并行的核心抽象
+        Device GIN API — GPU kernel 内调用
       
     </span>
   </a>
   
 </li>
+        
+          <li class="md-nav__item">
+  <a href="#gin-network-plugin-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GIN Network Plugin — 双 backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        设备端 API 示例
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deepep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DeepEP 集成：真实负载验证
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DeepEP 集成：真实负载验证">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        完成语义（非常重要）
+        集成要求
       
     </span>
   </a>
@@ -1832,26 +1936,54 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ordering-unordered" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Ordering — 默认 unordered
+        四个语义翻译挑战
       
     </span>
   </a>
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#multi-communicator-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        multi-communicator mapping
+      
+    </span>
+  </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#33-3-gin-network-plugin" class="md-nav__link">
+  <a href="#release-acquire" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.3 ③ GIN Network Plugin — 双语义
+        release-acquire 的优雅实现
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ht-kernel-batch4096-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HT kernel（大 batch，4096 tokens）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ll-kernel-batch1128-tokens" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LL kernel（小 batch，1–128 tokens）
       
     </span>
   </a>
@@ -1864,33 +1996,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-api" class="md-nav__link">
+  <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. 设备端 API 示例：环形交换
+        实验
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-deepep" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. DeepEP 集成：真实负载验证
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="5. DeepEP 集成：真实负载验证">
+    <nav class="md-nav" aria-label="实验">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#51" class="md-nav__link">
+  <a href="#microbench" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.1 集成要求
+        点对点 microbench
       
     </span>
   </a>
@@ -1898,10 +2019,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#52" class="md-nav__link">
+  <a href="#deepep-ht-kernelfp8bf16248" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.2 四大语义翻译挑战
+        DeepEP HT kernel（FP8/BF16，2/4/8 节点）
       
     </span>
   </a>
@@ -1909,43 +2030,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#53-trickmulti-communicator-mapping" class="md-nav__link">
+  <a href="#deepep-ll-kernelbf16hidden716814352-b" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5.3 关键 trick：multi-communicator mapping
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#54-release-acquire" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.4 release-acquire 语义的实现
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#55-ht-kernel-batch-4096-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.5 HT kernel（大 batch, 4096 tokens）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#56-ll-kernel-batch-1128-tokens" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5.6 LL kernel（小 batch, 1–128 tokens）
+        DeepEP LL kernel（BF16，hidden=7168，14352 B 消息）
       
     </span>
   </a>
@@ -1958,22 +2046,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-eos-h100-8400-gbps-ib" class="md-nav__link">
+  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. 实验（EOS 集群，H100 + 8×400 Gbps IB）
+        相对既有工作
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="6. 实验（EOS 集群，H100 + 8×400 Gbps IB）">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        我的几个判断
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="我的几个判断">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#61-microbenchping-pong-put-signal" class="md-nav__link">
+  <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.1 点对点 microbench（ping-pong put + signal）
+        现阶段限制（作者自己承认）
       
     </span>
   </a>
@@ -1981,10 +2080,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#62-deepep-ht-kernelfp8bf16248" class="md-nav__link">
+  <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.2 DeepEP HT kernel（FP8/BF16，2/4/8 节点）
+        对我的工作的几个影响
       
     </span>
   </a>
@@ -1992,10 +2091,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#63-deepep-ll-kernelbf16-hidden7168-14352b" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6.3 DeepEP LL kernel（BF16, hidden=7168, 14352B 消息）
+        有待观察
       
     </span>
   </a>
@@ -2008,82 +2107,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#7" class="md-nav__link">
+  <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. 相对既有工作的差异
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. 我的评估
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="8. 我的评估">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#81" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.1 关键价值
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#82" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.2 现阶段限制（作者自己承认）
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#83" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.3 对我的工作的启示
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#84" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.4 有待观察
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. 参考
+        相关链接
       
     </span>
   </a>
@@ -2238,25 +2265,28 @@
 
 <!-- more -->
 
-<h1 id="gpu-initiated-networking-for-nccl-nccl-gin">GPU-Initiated Networking for NCCL (NCCL GIN)<a class="headerlink" href="#gpu-initiated-networking-for-nccl-nccl-gin" title="Permanent link">&para;</a></h1>
+<h1 id="nccl-gin-device-initiated-rdma-nccl">NCCL GIN：把 device-initiated RDMA 带回 NCCL 生态<a class="headerlink" href="#nccl-gin-device-initiated-rdma-nccl" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>arXiv:2511.15076v2 · NVIDIA, 2025
-关键词：NCCL 2.28 Device API · GIN · DOCA GPUNetIO · one-sided RDMA · DeepEP</p>
+<p>arXiv:2511.15076v2 · NVIDIA, 2025</p>
+<p>关键词：NCCL 2.28 Device API · GIN · DOCA GPUNetIO · one-sided RDMA · DeepEP</p>
 </blockquote>
-<hr />
-<h2 id="1">1. 核心问题<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<p>现代 AI 负载（尤其是 <strong>MoE 推理</strong> 与 <strong>编译器生成的融合 kernel</strong>）需要从 GPU kernel 内部直接发起、细粒度、低延迟的 GPU↔GPU 通信。传统 NCCL 走 <strong>host-initiated</strong> 模型——CPU 编排所有通信、每次调用都是独立 kernel launch——对大规模集合通信很稳健，但对：</p>
+<h2 class="tldr-heading" id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">&para;</a></h2>
+<p>现代 AI 负载（尤其 MoE 推理和编译器生成的 fused kernel）需要从 GPU kernel 内部直接发起细粒度、低延迟的 GPU↔GPU 通信。传统 NCCL 是 host-initiated——CPU 编排每次通信、每次调用都是独立 kernel launch——对大规模集合通信很稳健，但对 MoE 动态 token routing、JAX/Triton 的 comm-compute fusion、推理 decode 的点对点小消息这类场景，CPU 协调和 host-device 同步开销是多余的。</p>
+<p>NVSHMEM 的 device-initiated RDMA（IBGDA）证明了低延迟的可能，但它是独立 runtime，和 NCCL 生态脱节：用户要么放弃 NCCL 的 topology-aware 集合和生产级基础设施，要么放弃 device-initiated 的低延迟。</p>
+<p>NCCL 2.28 的 <strong>GIN（GPU-Initiated Networking）</strong>把 device-initiated 一边 RDMA 语义纳入 NCCL 统一 runtime，双 backend 设计——<strong>GDAKI</strong>（DOCA GPUNetIO，GPU 直连 NIC）覆盖生产级硬件，<strong>Proxy</strong>（GPU → CPU → NIC）兜底任何 RDMA NIC。在 DeepEP 上的 HT kernel 已经和 NVSHMEM 打平（1–2% 差异），LL kernel 2 节点下 GIN 甚至<strong>比 NVSHMEM 低 9% 延迟</strong>。</p>
+<p>自然会问：这是不是意味着 NVSHMEM 以后没必要再单独挂？从 DeepEP 的验证看答案偏向"是"，但还有一些现阶段限制（window 对称大小、每 communicator 4 context）要解决。</p>
+<h2 id="device-initiated-rdma">为什么需要 device-initiated RDMA<a class="headerlink" href="#device-initiated-rdma" title="Permanent link">&para;</a></h2>
+<p>传统 NCCL 的模型是 host-initiated：CPU 决定什么时候通信、调用对应 collective kernel、等它完成。这对大规模集合通信（all-reduce、broadcast）是对的——数据大、调用稀、CPU 协调成本能摊薄。</p>
+<p>但现代负载和上面的假设越来越不符：</p>
 <ul>
-<li><strong>MoE 动态 token routing</strong>（DeepSeek-V3 风格）</li>
-<li><strong>JAX/Triton 的 comm-compute fusion</strong></li>
-<li><strong>推理 decode 阶段的点对点小消息</strong></li>
+<li><strong>MoE 动态 token routing</strong>（DeepSeek-V3 风格）：每 decode step 都有 token-to-expert 的小消息路由，走 host 一次 kernel launch 的延迟占比太大</li>
+<li><strong>JAX/Triton 的 comm-compute fusion</strong>：compiler 生成的 kernel 想在 kernel 内部完成通信 + 计算</li>
+<li><strong>推理 decode 阶段的点对点小消息</strong>：频繁、小、紧，CPU 协调纯开销</li>
 </ul>
-<p>则引入了不必要的 CPU 协调与 host-device 同步开销。</p>
-<p>NVSHMEM 已经证明了 <strong>device-initiated</strong> 通信（IBGDA）的价值，但它是独立 runtime，与 NCCL 生态脱节，用户要么放弃 NCCL 的 topology-aware 集合与生产级基础设施，要么放弃 device-initiated 的低延迟。</p>
-<p><strong>本文贡献</strong>：在 NCCL 2.28 的 Device API 中引入 <strong>GIN（GPU-Initiated Networking）</strong>，把 device-initiated 一边 RDMA 语义纳入 NCCL 统一 runtime，保留 NCCL 的 hierarchical communicator、容错、弹性扩缩等生产特性。</p>
-<hr />
-<h2 id="2-nccl-228-device-api">2. NCCL 2.28 Device API 全景<a class="headerlink" href="#2-nccl-228-device-api" title="Permanent link">&para;</a></h2>
-<p>Device API 提供三种 device-side 通信模式，对应三类硬件：</p>
+<p>NVSHMEM 加上 IBGDA 解决了 device-initiated 这件事，但它是独立 runtime，不具备 NCCL 的 topology-aware 集合、容错、弹性扩缩等生产特性。用户要么整个项目用 NVSHMEM、要么想办法两个 runtime 共存。</p>
+<p><strong>GIN 的定位</strong>就是把 device-initiated 一边 RDMA 语义带回 NCCL，保留 NCCL 的生产级基础设施。</p>
+<h2 id="nccl-228-device-api">NCCL 2.28 Device API 三模式<a class="headerlink" href="#nccl-228-device-api" title="Permanent link">&para;</a></h2>
+<p>Device API 根据底层互联提供三种 device-side 通信：</p>
 <table>
 <thead>
 <tr>
@@ -2277,18 +2307,20 @@
 <td>硬件 multicast / reduce</td>
 </tr>
 <tr>
-<td><strong>GIN</strong>（本文重点）</td>
+<td><strong>GIN</strong></td>
 <td>InfiniBand / RoCE（跨节点）</td>
 <td>跨节点 one-sided RDMA</td>
 </tr>
 </tbody>
 </table>
-<p><img alt="Device API 三模式与底层互联" src="../../../../../assets/papers/nccl-gin/NCCL_device_API.png" /></p>
-<p>与传统 host-initiated NCCL 的关键区别：<strong>Device API 操作的是 "collective symmetric memory window"</strong>，而传统 NCCL 在 regular memory 上跑 pipeline 原语（Simple / LL / LL128）。</p>
-<p><img alt="Device API（左）vs 传统 host-initiated NCCL（右）" src="../../../../../assets/papers/nccl-gin/gin_high_level.png" /></p>
-<hr />
-<h2 id="3-gin">3. GIN 三层架构<a class="headerlink" href="#3-gin" title="Permanent link">&para;</a></h2>
-<p><img alt="NCCL GIN 三层架构：NCCL Core → Device GIN API → GinNet Plugin（GDAKI / Proxy 双后端）；右侧灰色路径为原有 two-sided collectives" src="../../../../../assets/papers/nccl-gin/GIN_arch.png" /></p>
+<p><img alt="NCCL Device API" src="../../../../../assets/papers/nccl-gin/NCCL_device_API.png" /></p>
+<p class="figcaption">图 1-1 NCCL Device API 的三种模式与各自对应的底层互联</p>
+<p>和传统 host-initiated NCCL 的关键区别：<strong>Device API 操作的是 collective symmetric memory window</strong>，而传统 NCCL 在 regular memory 上跑 pipeline 原语（Simple / LL / LL128）。</p>
+<p><img alt="Device API vs traditional NCCL" src="../../../../../assets/papers/nccl-gin/gin_high_level.png" /></p>
+<p class="figcaption">图 1-2 Device API（左）和传统 host-initiated NCCL（右）的对比：前者 kernel 内直接发起、操作 symmetric window；后者 CPU 编排、跑 pipeline 原语</p>
+<h2 id="gin">GIN 三层架构<a class="headerlink" href="#gin" title="Permanent link">&para;</a></h2>
+<p><img alt="NCCL GIN architecture" src="../../../../../assets/papers/nccl-gin/GIN_arch.png" /></p>
+<p class="figcaption">图 1-3 NCCL GIN 的三层架构：NCCL Core 负责 host 侧资源；Device GIN API 提供 GPU-callable 原语；GinNet Plugin 有 GDAKI 和 Proxy 双后端</p>
 <p>对应到调用栈：</p>
 <pre class="mermaid"><code>flowchart TB
     App["Application&lt;br/&gt;PyTorch · TRT-LLM · vLLM · SGLang · DeepEP"]
@@ -2316,14 +2348,15 @@
     App -.kernel 内调用.-&gt; DevAPI
     Core --&gt; DevAPI
     DevAPI --&gt; Plugin</code></pre>
-<h3 id="31-1-nccl-core-host">3.1 ① NCCL Core — host 侧<a class="headerlink" href="#31-1-nccl-core-host" title="Permanent link">&para;</a></h3>
+<p class="figcaption">图 1-4 GIN 调用栈：应用既可以走 NCCL Core 做初始化，又可以在 kernel 内直接调 Device API</p>
+<h3 id="nccl-core-host">NCCL Core — host 侧<a class="headerlink" href="#nccl-core-host" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>ncclCommWindowRegister</code>：集合注册 memory window，返回含所有 peer remote key 的 handle</li>
 <li>资源分配、communicator 初始化、GIN context 创建</li>
-<li><strong>allocation 与 registration 解耦</strong>：可从已有 buffer 创建 window</li>
-<li>当前 NCCL 2.28 要求对称大小，未来将放开（对 disagg 的 prefill/decode 不同 buffer size 尤为重要）</li>
+<li><strong>allocation 与 registration 解耦</strong>：可以从已有 buffer 创建 window</li>
+<li>当前 NCCL 2.28 要求 window 对称大小，未来会放开（对 disagg 的 prefill/decode 不同 buffer size 尤其重要）</li>
 </ul>
-<h3 id="32-2-device-gin-api-gpu-kernel">3.2 ② Device GIN API — GPU kernel 内调用<a class="headerlink" href="#32-2-device-gin-api-gpu-kernel" title="Permanent link">&para;</a></h3>
+<h3 id="device-gin-api-gpu-kernel">Device GIN API — GPU kernel 内调用<a class="headerlink" href="#device-gin-api-gpu-kernel" title="Permanent link">&para;</a></h3>
 <p>四类操作：</p>
 <table>
 <thead>
@@ -2335,52 +2368,42 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>Data movement</strong></td>
+<td>Data movement</td>
 <td><code>put</code> / <code>putValue</code> / <code>signal</code></td>
 <td>单边写、小值 inline 写、远端通知</td>
 </tr>
 <tr>
-<td><strong>Local completion</strong></td>
+<td>Local completion</td>
 <td><code>flush</code> / <code>readCounter</code> / <code>waitCounter</code></td>
 <td>本地源 buffer 可复用</td>
 </tr>
 <tr>
-<td><strong>Remote completion</strong></td>
+<td>Remote completion</td>
 <td><code>readSignal</code> / <code>waitSignal</code></td>
 <td>远端数据已可见</td>
 </tr>
 <tr>
-<td><strong>Barrier / state</strong></td>
+<td>Barrier / state</td>
 <td><code>ncclGinBarrierSession</code> / <code>reset*</code></td>
 <td>跨 rank 同步、重置</td>
 </tr>
 </tbody>
 </table>
-<h4 id="context">Context：网络并行的核心抽象<a class="headerlink" href="#context" title="Permanent link">&para;</a></h4>
+<p><strong>Context 是网络并行的核心抽象</strong>。每个 context 封装一条 GPU↔NIC 通道（QP + connection），单 communicator 可以开多个 context，同时利用多 NIC、多 port、多 QP。一个 context 可寻址 communicator 内所有 rank，并发发向不同 peer。</p>
+<p><strong>完成语义</strong>（这一层很容易踩坑）：</p>
 <ul>
-<li>每个 context 封装一条 GPU↔NIC 通道（QP + connection）</li>
-<li><strong>单 communicator 多 context</strong>：可同时利用多 NIC、多 port、多 QP</li>
-<li>一个 context 可寻址 communicator 内所有 rank，并发发向不同 peer</li>
+<li><strong>Counter</strong>：本地、per-op、按用户提供的 <code>counterID</code> 计数。适合 pipeline 算法。</li>
+<li><strong>Signal</strong>：远端、<strong>ID 寻址</strong>（不是 OpenSHMEM 的 address 寻址），硬件实现更高效。</li>
+<li><strong>Flush ≠ Counter</strong>：flush 只保证 context 内<strong>本地</strong>全部完成（源 buffer 可复用），<strong>不保证远端可见</strong>。</li>
 </ul>
-<h4 id="_1">完成语义（非常重要）<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Counter</strong>：本地、per-op、按用户提供的 <code>counterID</code> 计数 → 适合 pipeline 算法</li>
-<li><strong>Signal</strong>：远端、<strong>ID 寻址</strong>（不是 OpenSHMEM 的 address 寻址）→ 硬件实现更高效</li>
-<li><strong>Flush</strong> ≠ Counter：flush 只保证 context 内<strong>本地</strong>全部完成（源 buffer 可复用），不保证远端可见</li>
-</ul>
-<h4 id="ordering-unordered">Ordering — 默认 unordered<a class="headerlink" href="#ordering-unordered" title="Permanent link">&para;</a></h4>
-<ul>
-<li>仅保证同 context、同 peer 的 <code>put</code> 与后续 <code>signal</code> 之间的顺序</li>
-<li>用法：批量 put 后最后一个带 signal，实现 <strong>release-acquire</strong> 语义</li>
-<li>线程间顺序用户用 CUDA 原语自己管（<code>__syncwarp</code> 等）</li>
-</ul>
-<h3 id="33-3-gin-network-plugin">3.3 ③ GIN Network Plugin — 双语义<a class="headerlink" href="#33-3-gin-network-plugin" title="Permanent link">&para;</a></h3>
+<p><strong>Ordering 默认 unordered</strong>。只保证同 context 同 peer 的 <code>put</code> 与后续 <code>signal</code> 之间的顺序。用法是批量 put 后最后一个带 signal，实现 <strong>release-acquire</strong> 语义。线程间顺序用户用 CUDA 原语自己管（<code>__syncwarp</code> 等）。</p>
+<h3 id="gin-network-plugin-backend">GIN Network Plugin — 双 backend<a class="headerlink" href="#gin-network-plugin-backend" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>维度</th>
-<th><strong>GDAKI</strong></th>
-<th><strong>Proxy</strong></th>
+<th>GDAKI</th>
+<th>Proxy</th>
 </tr>
 </thead>
 <tbody>
@@ -2422,8 +2445,8 @@
 </tbody>
 </table>
 <p>运行时通过 capability probe 自动选择，<code>NCCL_GIN_BACKEND</code> 可强制覆盖。</p>
-<hr />
-<h2 id="4-api">4. 设备端 API 示例：环形交换<a class="headerlink" href="#4-api" title="Permanent link">&para;</a></h2>
+<h2 id="api">设备端 API 示例<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>一个 ring exchange 的简化写法：</p>
 <div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">__global__</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">ringExchange</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">ncclDevComm</span><span class="w"> </span><span class="n">devComm</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">ncclWindow_t</span><span class="w"> </span><span class="n">sendWin</span><span class="p">,</span>
@@ -2444,16 +2467,15 @@
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="n">gin</span><span class="p">.</span><span class="n">resetSignal</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>关键点：</p>
+<p>几个 API 语义上的关键点：</p>
 <ul>
 <li><strong>window + offset 寻址</strong>（不是指针）</li>
-<li><code>SignalInc</code> / <code>SignalAdd</code> 可附加在 put 上，省一次额外 round-trip</li>
+<li><code>SignalInc</code> / <code>SignalAdd</code> 可附加在 <code>put</code> 上，省一次 round-trip</li>
 <li>协作级别通过 <code>ncclCoopCta()</code> / <code>ncclCoopThread()</code> / warp 变体选择</li>
 </ul>
-<hr />
-<h2 id="5-deepep">5. DeepEP 集成：真实负载验证<a class="headerlink" href="#5-deepep" title="Permanent link">&para;</a></h2>
-<p>DeepEP = DeepSeek 的 MoE 专用通信库，原生用 NVSHMEM + IBGDA。本文把 GIN 作为后端接入，<strong>与原 NVSHMEM 路径共存</strong>（用户按环境选择）。</p>
-<h3 id="51">5.1 集成要求<a class="headerlink" href="#51" title="Permanent link">&para;</a></h3>
+<h2 id="deepep">DeepEP 集成：真实负载验证<a class="headerlink" href="#deepep" title="Permanent link">&para;</a></h2>
+<p>DeepEP 是 DeepSeek 的 MoE 专用通信库，原生用 NVSHMEM + IBGDA。本文把 GIN 作为后端接入，<strong>与原 NVSHMEM 路径共存</strong>（用户按环境选择）。这是 GIN 第一次在"重度 device-initiated"的真实负载上被检验。</p>
+<h3 id="_1">集成要求<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2480,7 +2502,7 @@
 </tr>
 </tbody>
 </table>
-<h3 id="52">5.2 四大语义翻译挑战<a class="headerlink" href="#52" title="Permanent link">&para;</a></h3>
+<h3 id="_2">四个语义翻译挑战<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2491,60 +2513,59 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>地址模型</strong></td>
+<td>地址模型</td>
 <td>PGAS 指针 + symmetric heap</td>
 <td>window + offset</td>
 </tr>
 <tr>
-<td><strong>数据 API</strong></td>
-<td><code>put_nbi(dst_ptr, src_ptr, n, pe)</code> warp-collective</td>
+<td>数据 API</td>
+<td><code>put_nbi(dst, src, n, pe)</code> warp-collective</td>
 <td><code>put(team, peer, dstWin, dstOff, srcWin, srcOff, n)</code> thread</td>
 </tr>
 <tr>
-<td><strong>同步原语</strong></td>
+<td>同步原语</td>
 <td>远端 memory atomics（<code>atomic_add</code>）</td>
 <td>signal atomics（<code>signal(peer, id)</code> + <code>readSignal(id)</code>）</td>
 </tr>
 <tr>
-<td><strong>完成模型</strong></td>
+<td>完成模型</td>
 <td><code>quiet()</code> per-QP</td>
 <td><code>flush()</code> per-context（可并行完成检查）</td>
 </tr>
 <tr>
-<td><strong>Barrier</strong></td>
+<td>Barrier</td>
 <td><code>barrier(team)</code> 整团</td>
 <td><code>ncclGinBarrierSession</code> 带 session ID，可子集同步</td>
 </tr>
 </tbody>
 </table>
-<h3 id="53-trickmulti-communicator-mapping">5.3 关键 trick：multi-communicator mapping<a class="headerlink" href="#53-trickmulti-communicator-mapping" title="Permanent link">&para;</a></h3>
-<p>GIN 每 communicator 只有 4 个 context，而 DeepEP 要 24 QPs：</p>
+<h3 id="multi-communicator-mapping">multi-communicator mapping<a class="headerlink" href="#multi-communicator-mapping" title="Permanent link">&para;</a></h3>
+<p>GIN 每 communicator 只有 4 个 context，DeepEP 要 24 QPs，所以要开多个 communicator 拼：</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>num_comms = ceil(QPs / 4)
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>comm_id   = qp_id / 4
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>ctx_id    = qp_id % 4
 </span></code></pre></div>
-<p>通过多 communicator 补足 QP 并行度。</p>
-<h3 id="54-release-acquire">5.4 release-acquire 语义的实现<a class="headerlink" href="#54-release-acquire" title="Permanent link">&para;</a></h3>
-<p>用 <strong>zero-byte put + SignalAdd</strong> 模拟：批量 put 后发一个 0 字节 put 带 SignalAdd，利用 GIN "同 context 同 peer put-before-signal 有序" 的保证，实现 release-acquire。这是整个集成里最优雅的一笔。</p>
-<h3 id="55-ht-kernel-batch-4096-tokens">5.5 HT kernel（大 batch, 4096 tokens）<a class="headerlink" href="#55-ht-kernel-batch-4096-tokens" title="Permanent link">&para;</a></h3>
+<h3 id="release-acquire">release-acquire 的优雅实现<a class="headerlink" href="#release-acquire" title="Permanent link">&para;</a></h3>
+<p>用 <strong>zero-byte put + SignalAdd</strong> 模拟。批量 put 后发一个 0 字节 put 带 SignalAdd，利用 GIN "同 context 同 peer put-before-signal 有序" 的保证实现 release-acquire。这是整个集成里最优雅的一笔——用最小开销的操作撬动最强的同步保证。</p>
+<h3 id="ht-kernel-batch4096-tokens">HT kernel（大 batch，4096 tokens）<a class="headerlink" href="#ht-kernel-batch4096-tokens" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>SM 角色分化</strong>：奇数 SM = Sender + NVLink Receiver；偶数 SM = Forwarder（RDMA → NVLink 转发）</li>
+<li>SM 角色分化：奇数 SM = Sender + NVLink Receiver；偶数 SM = Forwarder（RDMA → NVLink 转发）</li>
 <li>head/tail 各走独立 channel（独立 communicator）避免竞争</li>
 <li>单线程 <code>put()</code> + <code>__syncwarp()</code> 复刻 warp-collective 语义</li>
 <li>协调 SM 负责 <code>flush</code> → barrier → reset signals → 元数据交换</li>
 </ul>
-<h3 id="56-ll-kernel-batch-1128-tokens">5.6 LL kernel（小 batch, 1–128 tokens）<a class="headerlink" href="#56-ll-kernel-batch-1128-tokens" title="Permanent link">&para;</a></h3>
+<h3 id="ll-kernel-batch1128-tokens">LL kernel（小 batch，1–128 tokens）<a class="headerlink" href="#ll-kernel-batch1128-tokens" title="Permanent link">&para;</a></h3>
 <ul>
 <li>全互联 RDMA mesh、per-expert signal</li>
 <li>SM 分配：<code>expert_idx = sm_id * G + warp_group_id</code>（<code>G = ceil(N_experts / N_SMs)</code>）</li>
 <li><strong>混合 NVLink-RDMA</strong>：先 <code>nccl_get_p2p_ptr</code> 判断是否同节点，能走 NVLink 就走</li>
-<li>FP8 量化在 host→RDMA 拷贝阶段内联做</li>
-<li>每个 destination 发送完后，由 counting warp 发 <code>zero-byte put + SignalAdd</code> 交付 token 计数</li>
+<li>FP8 量化在 host → RDMA 拷贝阶段内联做</li>
+<li>每个 destination 发完后，由 counting warp 发 <code>zero-byte put + SignalAdd</code> 交付 token 计数</li>
 </ul>
-<hr />
-<h2 id="6-eos-h100-8400-gbps-ib">6. 实验（EOS 集群，H100 + 8×400 Gbps IB）<a class="headerlink" href="#6-eos-h100-8400-gbps-ib" title="Permanent link">&para;</a></h2>
-<h3 id="61-microbenchping-pong-put-signal">6.1 点对点 microbench（ping-pong put + signal）<a class="headerlink" href="#61-microbenchping-pong-put-signal" title="Permanent link">&para;</a></h3>
-<p>小消息（4–128 B）round-trip 延迟：</p>
+<h2 id="_3">实验<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>环境是 EOS 集群，H100 + 8 × 400 Gbps IB。</p>
+<h3 id="microbench">点对点 microbench<a class="headerlink" href="#microbench" title="Permanent link">&para;</a></h3>
+<p>Ping-pong <code>put + signal</code>，小消息（4–128 B）round-trip 延迟：</p>
 <table>
 <thead>
 <tr>
@@ -2558,7 +2579,7 @@
 <td><strong>16.0</strong></td>
 </tr>
 <tr>
-<td><strong>NCCL GIN GDAKI</strong></td>
+<td>NCCL GIN GDAKI</td>
 <td><strong>16.7</strong></td>
 </tr>
 <tr>
@@ -2571,12 +2592,8 @@
 </tr>
 </tbody>
 </table>
-<ul>
-<li>GDAKI 与 NVSHMEM IBRC 同档，优于 NVSHMEM IBGDA</li>
-<li>Proxy 尽管走 GPU→CPU queue，仍只比 GDAKI 多 1.3μs</li>
-<li>大消息带宽受限，四者收敛</li>
-</ul>
-<h3 id="62-deepep-ht-kernelfp8bf16248">6.2 DeepEP HT kernel（FP8/BF16，2/4/8 节点）<a class="headerlink" href="#62-deepep-ht-kernelfp8bf16248" title="Permanent link">&para;</a></h3>
+<p>GDAKI 和 NVSHMEM IBRC 同档，优于 NVSHMEM IBGDA。Proxy 尽管走 GPU → CPU queue，仍只比 GDAKI 多 1.3 μs。大消息带宽受限，四者收敛。</p>
+<h3 id="deepep-ht-kernelfp8bf16248">DeepEP HT kernel（FP8/BF16，2/4/8 节点）<a class="headerlink" href="#deepep-ht-kernelfp8bf16248" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -2601,12 +2618,12 @@
 </tr>
 </tbody>
 </table>
-<p><strong>全配置内两者差异 1–2%</strong>。</p>
-<h3 id="63-deepep-ll-kernelbf16-hidden7168-14352b">6.3 DeepEP LL kernel（BF16, hidden=7168, 14352B 消息）<a class="headerlink" href="#63-deepep-ll-kernelbf16-hidden7168-14352b" title="Permanent link">&para;</a></h3>
+<p>全配置下两者差异 <strong>1–2%</strong>。</p>
+<h3 id="deepep-ll-kernelbf16hidden716814352-b">DeepEP LL kernel（BF16，hidden=7168，14352 B 消息）<a class="headerlink" href="#deepep-ll-kernelbf16hidden716814352-b" title="Permanent link">&para;</a></h3>
 <p><strong>NVLink enabled</strong>：</p>
 <ul>
 <li>1 node：GIN dispatch 185.28 GB/s / 40.62 μs；NVSHMEM 182.15 GB/s / 41.43 μs</li>
-<li>2 nodes：GIN 延迟 <strong>比 NVSHMEM 低 9%</strong>（142.51 vs 157.00 μs）</li>
+<li>2 nodes：GIN 延迟<strong>比 NVSHMEM 低 9%</strong>（142.51 vs 157.00 μs）</li>
 <li>combine 全规模 1–3% 内</li>
 </ul>
 <p><strong>NVLink disabled（pure RDMA）</strong>：</p>
@@ -2615,8 +2632,7 @@
 <li>8 nodes：34–35 GB/s / 219–225 μs</li>
 </ul>
 <p><strong>结论</strong>：GIN 在 DeepEP 这种重度 device-initiated 负载上，性能已经追平甚至略超 NVSHMEM/IBGDA。</p>
-<hr />
-<h2 id="7">7. 相对既有工作的差异<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<h2 id="_4">相对既有工作<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -2627,70 +2643,70 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>NVSHMEM</strong></td>
+<td>NVSHMEM</td>
 <td>独立 runtime，脱离 NCCL 生态</td>
 <td>同语义、同能力，直接内建在 NCCL 2.28</td>
 </tr>
 <tr>
-<td><strong>GPUrdma / GIO</strong></td>
+<td>GPUrdma / GIO</td>
 <td>GPU-NIC memory consistency 难</td>
 <td>靠 DOCA GPUNetIO 的生产级设备 verbs + ID-based signal</td>
 </tr>
 <tr>
-<td><strong>GPUDirect Async（2016）</strong></td>
+<td>GPUDirect Async (2016)</td>
 <td>CPU 仍需预构描述符</td>
 <td>GPU 线程完全自主构造 WQE + 写 doorbell</td>
 </tr>
 <tr>
-<td><strong>DeepEP / pplx-kernels</strong></td>
+<td>DeepEP / pplx-kernels</td>
 <td>独立库，无法复用 NCCL 集合、topology、容错</td>
 <td>GIN 是 NCCL 原生原语，可与集合混用</td>
 </tr>
 <tr>
-<td><strong>MSCCL / MSCCL++</strong></td>
+<td>MSCCL / MSCCL++</td>
 <td>聚焦 synthesized collective，device-initiated 点对点 RDMA 不是核心</td>
 <td>GIN 专注 device-initiated RDMA + 单边语义</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="8">8. 我的评估<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
-<h3 id="81">8.1 关键价值<a class="headerlink" href="#81" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>生态统一</strong>：第一次把 device-initiated RDMA 以原生 plugin 形式接入 NCCL，意味着未来 TRT-LLM / vLLM / SGLang / PyTorch 里<strong>不必再挂 NVSHMEM</strong> 这第二套 runtime</li>
-<li><strong>双 backend 是务实设计</strong>：GDAKI 上限高但硬件门槛高（ConnectX-6 Dx+、CUDA 12.2+）；Proxy 兜底任何 RDMA NIC，部署生命周期更长</li>
-<li><strong>ID-based signal</strong>：相比 OpenSHMEM address-based 同步更简洁、硬件实现更友好，也给 NIC/DPU 设计留了空间</li>
-<li><strong>释放了 release-acquire via zero-byte put + SignalAdd 的模式</strong>：这在未来 MoE / disagg 通信里会被大量复用</li>
-</ol>
-<h3 id="82">8.2 现阶段限制（作者自己承认）<a class="headerlink" href="#82" title="Permanent link">&para;</a></h3>
+<h2 id="_5">我的几个判断<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p><strong>生态统一</strong>。第一次把 device-initiated RDMA 以原生 plugin 形式接入 NCCL，意味着未来 TRT-LLM / vLLM / SGLang / PyTorch 里<strong>不必再挂 NVSHMEM 这第二套 runtime</strong>。对运维面是明显收敛。</p>
+<p><strong>双 backend 是务实设计</strong>。GDAKI 上限高但硬件门槛高（ConnectX-6 Dx+、CUDA 12.2+）；Proxy 兜底任何 RDMA NIC，部署生命周期更长。对大规模异构集群很关键。</p>
+<p><strong>ID-based signal 比 address-based 更简洁</strong>。相比 OpenSHMEM 的 address-based 同步，ID-based 硬件实现更友好，也给 NIC/DPU 设计留了空间。</p>
+<p><strong>release-acquire via zero-byte put + SignalAdd 是会被大量复用的模式</strong>。在未来 MoE / disagg 通信里这个 pattern 会反复出现。</p>
+<h3 id="_6">现阶段限制（作者自己承认）<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li>NCCL 2.28 窗口大小要求对称（disagg prefill/decode 异构 buffer 还没法原生表达）</li>
 <li>每 communicator 4 context 对 DeepEP 这种重度并行还是紧，要多开 communicator 拼</li>
-<li>GDAKI 的 WQE 还没 batch，一次 doorbell 一次操作；作者 roadmap 已列优化</li>
+<li>GDAKI 的 WQE 还没 batch，一次 doorbell 一次操作；roadmap 已列优化</li>
 <li>评测集中在 DeepEP，暂无 JAX/Triton/PyTorch distributed 的端到端数据</li>
 </ul>
-<h3 id="83">8.3 对我的工作的启示<a class="headerlink" href="#83" title="Permanent link">&para;</a></h3>
+<h3 id="_7">对我的工作的几个影响<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p><strong>AFD / disagg serving</strong>：GIN 的 per-context flush、signal 远端同步非常契合 Attention↔FFN 的 per-layer 紧同步需求，比 NCCL send/recv + host launch 低延迟得多。值得跟进。</p>
+<p><strong>NIXL / KV transfer</strong>：KV cache 跨实例传输天然是 one-sided 写 + 远端完成通知，GIN 直接可用。以后 NIXL 可能复用 GIN 作为 RDMA 后端。</p>
+<p><strong>MoE 推理</strong>：若 DeepEP 未来官方支持 GIN backend，部署依赖从 NVSHMEM 迁移到 NCCL，运维面大幅收敛。</p>
+<h3 id="_8">有待观察<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>AFD / disagg serving</strong>：GIN 的 per-context flush、signal 远端同步非常契合 Attention↔FFN 的 per-layer 紧同步需求，比 NCCL send/recv + host launch 的老路径低延迟得多，值得跟进</li>
-<li><strong>NIXL / KV transfer</strong>：KV cache 跨实例传输天然是 one-sided 写 + 远端完成通知，GIN 直接可用；以后 NIXL 可能可以复用 GIN 作为 RDMA 后端</li>
-<li><strong>MoE 推理</strong>：若 DeepEP 未来官方支持 GIN backend，部署依赖会从 NVSHMEM 迁移到 NCCL，运维面大幅收敛</li>
-</ul>
-<h3 id="84">8.4 有待观察<a class="headerlink" href="#84" title="Permanent link">&para;</a></h3>
-<ul>
-<li>GDAKI 的 WQE batching / doorbell amortization 落地后，是否能在小消息把延迟压到 10μs 以下</li>
+<li>GDAKI 的 WQE batching / doorbell amortization 落地后，能否把小消息延迟压到 10 μs 以下</li>
 <li>NCCL Symmetric memory window 放开非对称大小的节奏（disagg 真正需要）</li>
 <li>非 NVIDIA NIC 厂商（Broadcom / AWS EFA 等）是否会跟 Proxy plugin 语义对接</li>
 </ul>
-<hr />
-<h2 id="9">9. 参考<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<p>后续生态进展再更新。</p>
+<h2 id="_9">相关链接<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <ul>
+<li><a href="https://arxiv.org/abs/2511.15076">arXiv:2511.15076</a></li>
 <li>NCCL 2.28 Device API 官方文档</li>
 <li>DOCA GPUNetIO（GDAKI 底层）</li>
 <li>NVSHMEM / IBGDA 对比基线</li>
-<li>DeepEP（MoE 集成样板）</li>
+<li><a href="../../../../../projects/deepep/">DeepEP 项目笔记</a></li>
 <li>MPI RMA window 模型（window 语义借鉴来源）</li>
 </ul>
-<p>相关笔记：<a href="../../../../../communication/">通信与网络 →</a></p>
+<p>KB 内：</p>
+<ul>
+<li><a href="../../../../../projects/deepep/">DeepEP 项目笔记</a></li>
+<li><a href="../../24/2026-04-24-deepseek-v4/">DeepSeek-V4 架构</a> / <a href="../../24/2026-04-24-deepseek-v4-infra/">基础设施</a></li>
+<li><a href="../../../../../communication/">通信与网络 →</a></li>
+</ul>
 
 
 
@@ -2750,6 +2766,22 @@
             </div>
           </a>
         
+        
+          
+          <a href="../../24/2026-04-24-deepseek-v4/" class="md-footer__link md-footer__link--next" aria-label="Next: 2026 04 24 deepseek v4">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                2026 04 24 deepseek v4
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
         
       </nav>
     

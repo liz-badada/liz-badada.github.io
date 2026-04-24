@@ -2,134 +2,154 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://liz-badada.github.io/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/roadmap/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/tags/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/agentic-rl/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/agents/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/attention/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/benchmarks/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/communication/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/diffusion/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/engines/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/hardware/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/kv-cache/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/large-scale/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/long-context/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/moe/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/multimodal/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/2026/04/09/2026-04-09-afd-optimal-ratio/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/2026/04/09/2026-04-09-frontier-simulator/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/2026/04/20/2026-04-20-afd-challenges/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/2026/04/23/2026-04-23-nccl-gin/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
+    </url>
+    <url>
+         <loc>https://liz-badada.github.io/papers/2026/04/24/2026-04-24-deepseek-v4-infra/</loc>
+         <lastmod>2026-04-24</lastmod>
+    </url>
+    <url>
+         <loc>https://liz-badada.github.io/papers/2026/04/24/2026-04-24-deepseek-v4/</loc>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/parallelism/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/perf-modeling/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/post-training/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/projects/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/projects/aiconfigurator/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
+    </url>
+    <url>
+         <loc>https://liz-badada.github.io/projects/deepep/</loc>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/quantization/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/scheduling/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/training/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/archive/2026/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
+    </url>
+    <url>
+         <loc>https://liz-badada.github.io/papers/category/large-scale/</loc>
+         <lastmod>2026-04-24</lastmod>
+    </url>
+    <url>
+         <loc>https://liz-badada.github.io/papers/category/moe/</loc>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/category/communication/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/category/parallelism/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
     <url>
          <loc>https://liz-badada.github.io/papers/category/perf-modeling/</loc>
-         <lastmod>2026-04-23</lastmod>
+         <lastmod>2026-04-24</lastmod>
     </url>
 </urlset>

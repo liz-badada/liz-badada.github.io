@@ -719,6 +719,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -781,6 +785,66 @@
     
   
     communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../papers/category/large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    large-scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../papers/category/moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    moe
   
 
     
@@ -2094,6 +2158,7 @@
 <li><strong>LLaMA-3 training paper</strong> (Meta, 2024) — 16k H100s, failure log.</li>
 <li><strong>GPT-4 / Gemini / Claude</strong> infrastructure write-ups (sparse but useful).</li>
 <li><strong>MegaScale</strong> (ByteDance, NSDI 2024).</li>
+<li><strong>DeepSeek-V4 infra</strong> (2026-04-24) — wave-scheduled EP overlap (MegaMoE, <code>C/B ≤ 2d = 6144 FLOPs/Byte</code>), TileLang DSL, batch-invariant/deterministic kernels, FP4 QAT with lossless FP4→FP8 dequant, Hybrid ZeRO for Muon, Contextual Parallelism for 1M ctx, heterogeneous KV cache + on-disk storage (3FS), token-granular WAL for preemptible RL rollout, DSec sandbox (Firecracker/QEMU + EROFS). See <a href="../papers/2026/04/24/2026-04-24-deepseek-v4-infra/">DeepSeek-V4 基础设施拆解</a>.</li>
 </ul>
 <h2 id="canonical-references">Canonical references<a class="headerlink" href="#canonical-references" title="Permanent link">&para;</a></h2>
 <ul>

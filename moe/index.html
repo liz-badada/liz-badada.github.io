@@ -719,6 +719,10 @@
       
         
       
+        
+      
+        
+      
     
     
     
@@ -781,6 +785,66 @@
     
   
     communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../papers/category/large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    large-scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../papers/category/moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    moe
   
 
     
@@ -1334,6 +1398,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recent-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recent notes
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1947,6 +2022,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#recent-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recent notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#canonical-references" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2015,7 +2101,7 @@
 <h3 id="expert-parallelism-ep">Expert parallelism (EP)<a class="headerlink" href="#expert-parallelism-ep" title="Permanent link">&para;</a></h3>
 <ul>
 <li>All-to-all dispatch / combine — usually the bottleneck.</li>
-<li><strong>DeepEP</strong> — FP8 / NVLink-aware all-to-all.</li>
+<li><strong>DeepEP</strong> — FP8 / NVLink-aware all-to-all. v2 rewrite unifies HT/LL into <code>ElasticBuffer</code>, switches RDMA backend to NCCL GIN, scales to EP 2048. See <a href="../projects/deepep/">project note → DeepEP</a>.</li>
 <li>EP + TP + DP mixing.</li>
 </ul>
 <h3 id="moe-inference">MoE inference<a class="headerlink" href="#moe-inference" title="Permanent link">&para;</a></h3>
@@ -2030,12 +2116,17 @@
 <li>Expert-parallel gradient sync.</li>
 <li>Upcycling from dense (Qwen1.5-MoE approach).</li>
 </ul>
+<h2 id="recent-notes">Recent notes<a class="headerlink" href="#recent-notes" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>DeepSeek-V4</strong> (2026-04-24) — MLA dropped; Hybrid Attention = CSA (sequence-dim compression + DSA) + HCA (heavier compression, dense); Shared-KV MQA; mHC residuals; Muon optimizer; FP4+FP8 mixed training; 1M native context; KV cache ≈10% of V3.2. See <a href="../papers/2026/04/24/2026-04-24-deepseek-v4/">DeepSeek-V4：MLA 彻底不用了？</a>.</li>
+</ul>
 <h2 id="canonical-references">Canonical references<a class="headerlink" href="#canonical-references" title="Permanent link">&para;</a></h2>
 <ul>
 <li><em>GShard</em> (Lepikhin et al., 2020)</li>
 <li><em>Switch Transformer</em> (Fedus et al., 2021)</li>
 <li><em>Expert Choice Routing</em> (Zhou et al., 2022)</li>
 <li><em>DeepSeek-V2 / V3</em> — auxiliary-loss-free MoE</li>
+<li><em>DeepSeek-V4</em> — Hybrid CSA+HCA attention, mHC, Muon, FP4 training</li>
 <li><em>DeepEP</em> — comm kernels</li>
 <li><em>Mixtral of Experts</em> (Jiang et al., 2024)</li>
 </ul>

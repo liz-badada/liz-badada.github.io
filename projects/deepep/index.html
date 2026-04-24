@@ -1,0 +1,2627 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Notes on LLM inference, training, RL, agents, multimodal, and GPU systems — from papers and open-source projects.">
+      
+      
+        <meta name="author" content="liz-badada">
+      
+      
+        <link rel="canonical" href="https://liz-badada.github.io/projects/deepep/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>DeepEP v2 - AI Infra Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deepep-v2epv2-engramppcp-nccl-gin" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AI Infra Notes" class="md-header__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI Infra Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              DeepEP v2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="amber"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/liz-badada/liz-badada.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    liz-badada/liz-badada.github.io
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../roadmap/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Roadmap
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../papers/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Papers
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../engines/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Inference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../parallelism/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Parallelism & Comm
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../training/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Training & RL
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../agents/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Applications
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../hardware/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Foundations
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Projects
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../tags/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Tags
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI Infra Notes" class="md-nav__button md-logo" aria-label="AI Infra Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI Infra Notes
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/liz-badada/liz-badada.github.io" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    liz-badada/liz-badada.github.io
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Roadmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../papers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Papers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Papers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/archive/2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Categories
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Categories
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/category/communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/category/large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    large-scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/category/moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    moe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/category/parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../papers/category/perf-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    perf-modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../engines/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache & Memory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attention & Kernels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../scheduling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scheduling & Batching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization & Compression
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../parallelism/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parallelism & Comm
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Parallelism & Comm
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../large-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ultra-scale Training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Communication & Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../moe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MoE Systems
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../long-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Long Context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../training/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training & RL
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Training & RL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../post-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-training (RLHF/DPO/GRPO)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agentic-rl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic RL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../agents/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Applications
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Applications
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../multimodal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multimodal & Omni
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../diffusion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion & Gen Media
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../hardware/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../perf-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Perf Modeling & Simulation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks & Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Projects
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tags
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 一句话要点
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-v1-v2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. v1 → v2 变化矩阵
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-elastic-legacy-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 源码结构：elastic / legacy / backend 三分
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-nccl-gin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. NCCL GIN 后端接入细节
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. NCCL GIN 后端接入细节">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-ncclcomminitrank-pg-comm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 自己 ncclCommInitRank，不复用 PG comm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-communicator-context-paper-communicator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 一个 communicator 多 context（不像 paper 描述的多 communicator）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-connection_rail-vs-connection_full" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 CONNECTION_RAIL vs CONNECTION_FULL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44-gin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.4 热路径上的 GIN 调用
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-unified-elasticbuffer-hybrid-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Unified ElasticBuffer + Hybrid Kernel
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Unified ElasticBuffer + Hybrid Kernel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-warp-hybrid_dispatchcuh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 warp 分工（hybrid_dispatch.cuh）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-warp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 warp 数公式
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-engram-pp-agrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Engram / PP / AGRS 三个新原语
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Engram / PP / AGRS 三个新原语">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-engram0-sm-sparse-gather-via-rdma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Engram（0-SM sparse gather via RDMA）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-pp-sendrecv-warp-kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 PP send/recv（持久单 warp kernel）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-agrscp-all-gather-reduce-scatter-via-copy-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 AGRS（CP all-gather / reduce-scatter via Copy Engine）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-smqp-autotuner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 解析 SM/QP 计算（杀掉 autotuner 的核心）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-jit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. JIT 编译系统
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-barrier-with-timeout-ptx-trap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Barrier with Timeout + PTX trap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 我的评估
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 我的评估">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 真正的架构级变化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 增量改良（没那么颠覆）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#103" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.3 使用者要注意的坑
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#104" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.4 对我工作的启示
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#105-nccl-gin-paper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.5 相对 NCCL GIN paper 的实证价值
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 代码导航
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">cp</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">deepep</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">elasticbuffer</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">engram</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ep</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gin</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">jit</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">moe</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">nccl</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">pp</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="deepep-v2epv2-engramppcp-nccl-gin">DeepEP v2：EPv2 + Engram/PP/CP + NCCL GIN 后端<a class="headerlink" href="#deepep-v2epv2-engramppcp-nccl-gin" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>DeepSeek-AI · PR <a href="https://github.com/deepseek-ai/DeepEP/pull/605">#605</a> "Introducing EPv2: faster EP, and Engram/PP/CP supports" · 分支 <code>epv2-release</code> · 2026-04
+关联阅读：<a href="../../papers/2026/04/23/2026-04-23-nccl-gin/">GPU-Initiated Networking for NCCL (NCCL GIN)</a></p>
+</blockquote>
+<hr />
+<h2 id="1">1. 一句话要点<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>DeepEP v2 是对 v1 的<strong>完全重写</strong>：把 HT/LL kernel 合成统一的 <code>ElasticBuffer</code>，把 RDMA 后端从 NVSHMEM/IBGDA 切到 <strong>NCCL GIN</strong>，用<strong>解析 SM/QP 公式</strong>替掉离线 autotuner，新增 <strong>Engram / PP / CP</strong> 三个 experimental 通信原语；同 token 规模下峰值快 1.3×、SM 省 4×，scale-out 可撑到 EP=2048。</p>
+<hr />
+<h2 id="2-v1-v2">2. v1 → v2 变化矩阵<a class="headerlink" href="#2-v1-v2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>v1</th>
+<th>v2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RDMA 后端</td>
+<td>NVSHMEM IBGDA</td>
+<td><strong>NCCL GIN</strong>（header-only，依赖 NCCL ≥ 2.30.4）</td>
+</tr>
+<tr>
+<td>API 形态</td>
+<td>HT buffer / LL buffer 各自 kernel</td>
+<td>统一 <code>ElasticBuffer</code>（内部自动 <code>dispatch_impl</code> vs <code>hybrid_dispatch_impl</code>）</td>
+</tr>
+<tr>
+<td>Kernel 编译</td>
+<td>部分 JIT + 预编译</td>
+<td><strong>全 JIT，per-config 生成 <code>.cu</code> → NVCC → CUBIN 缓存</strong></td>
+</tr>
+<tr>
+<td>SM/QP 配置</td>
+<td>离线 autotune</td>
+<td><strong>解析公式一次算好</strong>（见 §7）</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td>EP ≤ 320 级</td>
+<td><strong>EP ≤ 2048</strong></td>
+</tr>
+<tr>
+<td>典型 SM 用量（V3-like 训练）</td>
+<td>24 SMs</td>
+<td><strong>4–6 SMs</strong></td>
+</tr>
+<tr>
+<td>新原语</td>
+<td>无</td>
+<td><strong>Engram</strong>（RDMA sparse gather）、<strong>PP send/recv</strong>、<strong>AGRS</strong>（CP all-gather via copy engine）</td>
+</tr>
+<tr>
+<td>0-SM 变体</td>
+<td>0-SM LL RDMA EP</td>
+<td>Engram / PP with RDMA、CP with Copy Engine（<strong>0-SM LL EP 被删</strong>）</td>
+</tr>
+</tbody>
+</table>
+<p>性能（README verbatim，H100/B100 + CX7）：</p>
+<table>
+<thead>
+<tr>
+<th>Arch</th>
+<th>Topo</th>
+<th>Dispatch BW</th>
+<th>Combine BW</th>
+<th>#SMs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SM90</td>
+<td>EP 8×2</td>
+<td>90 GB/s RDMA</td>
+<td>81 GB/s RDMA</td>
+<td>12</td>
+</tr>
+<tr>
+<td>SM90</td>
+<td>EP 8×4</td>
+<td>61 GB/s RDMA</td>
+<td>61 GB/s RDMA</td>
+<td><strong>6</strong></td>
+</tr>
+<tr>
+<td>SM100</td>
+<td>EP 8 (NVLink)</td>
+<td><strong>726 GB/s</strong></td>
+<td><strong>740 GB/s</strong></td>
+<td>64</td>
+</tr>
+<tr>
+<td>SM100</td>
+<td>EP 8 (NVLink)</td>
+<td>643 GB/s</td>
+<td>675 GB/s</td>
+<td>24</td>
+</tr>
+</tbody>
+</table>
+<p>依赖：Hopper 或 SM90 PTX；CUDA ≥ 12.3；PyTorch ≥ 2.10；<strong>NCCL ≥ 2.30.4</strong>（对应 NCCL 2.28 Device API + GIN 的正式版）。NVSHMEM 仍保留用于 <code>legacy</code> 路径，v2 主路径不再需要。</p>
+<hr />
+<h2 id="3-elastic-legacy-backend">3. 源码结构：elastic / legacy / backend 三分<a class="headerlink" href="#3-elastic-legacy-backend" title="Permanent link">&para;</a></h2>
+<p>PR 把代码分成三块：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>csrc/kernels/
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  backend/        # nccl.cu · nvshmem.cu · cuda_driver.cu（并列共存，运行时选）
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  elastic/        # v2 launcher：api / barrier / dispatch / combine /
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                  #            engram / pp_send_recv（都是 .hpp 薄壳）
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  legacy/         # v1 的 internode.cu / internode_ll.cu / intranode.cu 原样保留
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>deep_ep/include/deep_ep/
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  common/         # comm.cuh · handle.cuh · layout.cuh · ptx.cuh（header-only 基础层）
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  impls/          # 真实 kernel body：dispatch.cuh / combine.cuh /
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                  #  hybrid_dispatch.cuh / hybrid_combine.cuh /
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                  #  engram_fetch.cuh / pp_send_recv.cuh / barrier.cuh ...
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>deep_ep/buffers/
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>  elastic.py      # v2 的 ElasticBuffer：dispatch / combine / engram_* / pp_* / all_gather
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>  legacy.py       # v1 API 兼容层
+</span></code></pre></div>
+<p>关键观察：<strong>v2 kernel body 都是 <code>.cuh</code>（header-only），没有预编译 <code>.cu</code></strong>——每个 kernel 要跑之前由 JIT 按 <code>(num_sms, num_channels, num_ranks_scaleup, num_ranks_scaleout, hidden, num_topk, ...)</code> 组合生成一个 <code>.cu</code> 再 NVCC 编译，CUBIN 进磁盘缓存（<code>kernel_signature = name$$sig$$flags$$code</code> 做 key，atomic rename 避免并发冲突）。</p>
+<hr />
+<h2 id="4-nccl-gin">4. NCCL GIN 后端接入细节<a class="headerlink" href="#4-nccl-gin" title="Permanent link">&para;</a></h2>
+<p>结合前一篇 <a href="2026-04-23-nccl-gin.md">NCCL GIN 论文笔记</a> 看，DeepEP v2 怎么用 GIN 有几点<strong>和 paper 里对 v1 集成的描述明显不同</strong>：</p>
+<h3 id="41-ncclcomminitrank-pg-comm">4.1 自己 <code>ncclCommInitRank</code>，不复用 PG comm<a class="headerlink" href="#41-ncclcomminitrank-pg-comm" title="Permanent link">&para;</a></h3>
+<p>README 宣传"reuse existing NCCL communicators"，但 <code>csrc/kernels/backend/nccl.cu</code> 里实际做的是：</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ncclComm_t</span><span class="w"> </span><span class="n">comm</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">NCCL_CHECK</span><span class="p">(</span><span class="n">ncclCommInitRank</span><span class="p">(</span><span class="o">&amp;</span><span class="n">comm</span><span class="p">,</span><span class="w"> </span><span class="n">num_ranks</span><span class="p">,</span><span class="w"> </span><span class="n">root_unique_id</span><span class="p">,</span><span class="w"> </span><span class="n">rank_idx</span><span class="p">));</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">return</span><span class="w"> </span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="kt">int64_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">comm</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Python 侧从用户 PG 取 unique_id，但<strong>总是建新的 comm</strong>。"复用"意义上是从同一个 unique_id 派生——形式上可以自己传 <code>nccl_comm</code> handle 进 <code>NCCLSymmetricMemoryContext</code>，但 out-of-the-box 不走这条。要和训练框架的 comm 真正共享要自己改 Python shim。</p>
+<h3 id="42-communicator-context-paper-communicator">4.2 一个 communicator 多 context（不像 paper 描述的多 communicator）<a class="headerlink" href="#42-communicator-context-paper-communicator" title="Permanent link">&para;</a></h3>
+<p>paper 里写每 communicator 4 个 context、DeepEP 要 24 QPs 所以要开 <code>ceil(24/4)=6</code> 个 communicator + 做 <code>comm_id / ctx_id</code> 映射。v2 里：</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginContextCount</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">num_allocated_qps</span><span class="p">;</span><span class="w">       </span><span class="c1">// 65 或 129</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginExclusiveContexts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginQueueDepth</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginTrafficClass</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">sl_idx</span><span class="p">;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginSignalCount</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">num_ranks</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="p">;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="n">reqs</span><span class="p">.</span><span class="n">ginConnectionType</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">allow_hybrid_mode</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">NCCL_GIN_CONNECTION_RAIL</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">                                              </span><span class="o">:</span><span class="w"> </span><span class="n">NCCL_GIN_CONNECTION_FULL</span><span class="p">;</span>
+</span></code></pre></div>
+<p><strong>直接把 context 数开到 65/129（hybrid）或 17（non-hybrid）</strong>，single comm 内多路复用，完全跳过 paper 那个"多 communicator 拼 QP"的 workaround——说明 NCCL 2.30 的 GIN 已经放开了 context 数量限制（paper 对应的是 2.28）。</p>
+<h3 id="43-connection_rail-vs-connection_full">4.3 <code>CONNECTION_RAIL</code> vs <code>CONNECTION_FULL</code><a class="headerlink" href="#43-connection_rail-vs-connection_full" title="Permanent link">&para;</a></h3>
+<p>新拓扑 flag：<code>RAIL</code> 只沿 NIC 轨道建连，<code>FULL</code> 全互联。Hybrid 模式（scale-out&gt;1，有 NVLink 做 forwarding）走 <code>RAIL</code>；纯 RDMA 全互联走 <code>FULL</code>。这个抽象正对 hybrid dispatch 里 "forwarder warps 先走 NVLink 再 rail-exit 出 RDMA" 的拓扑假设。</p>
+<h3 id="44-gin">4.4 热路径上的 GIN 调用<a class="headerlink" href="#44-gin" title="Permanent link">&para;</a></h3>
+<p>Dispatch kernel 典型序列：</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// 小 put：发送端先写 per-rank token count 到接收端元数据</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">gin</span><span class="p">.</span><span class="n">put_value</span><span class="o">&lt;</span><span class="n">team_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">dst_rank_counter</span><span class="p">,</span><span class="w"> </span><span class="n">rank_count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">                     </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ncclGinOptFlagsAggregateRequests</span><span class="p">);</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">// 大 put：发送 token payload</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">gin</span><span class="p">.</span><span class="n">put</span><span class="o">&lt;</span><span class="n">team_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">recv_buffer</span><span class="p">.</span><span class="n">get_token_buffer</span><span class="p">(</span><span class="n">slot</span><span class="p">).</span><span class="n">get_base_ptr</span><span class="p">(),</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">                </span><span class="n">send_buffer_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">tma_buffer</span><span class="p">.</span><span class="n">get_num_bytes</span><span class="o">&lt;</span><span class="nb">false</span><span class="o">&gt;</span><span class="p">(),</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">                </span><span class="n">dst_rank_idx</span><span class="p">);</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="c1">// signal：release-acquire，保证之前 put 全部到达后再通知</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">gin</span><span class="p">.</span><span class="n">signal</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">ncclGin_SignalInc</span><span class="p">{</span><span class="n">rank_idx</span><span class="p">});</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="c1">// flush：本地源 buffer 可复用</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="n">ncclGin</span><span class="p">(</span><span class="n">nccl_dev_comm</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">NCCL_GIN_RESOURCE_SHARING_CTA</span><span class="p">).</span><span class="n">flush</span><span class="p">(</span><span class="n">ncclCoopWarp</span><span class="p">());</span>
+</span></code></pre></div>
+<p>和 paper 描述的 "zero-byte put + SignalAdd 模拟 release-acquire" 一致，但细节上 v2 的 signal 是有 payload 的 <code>SignalInc</code>，更直接。</p>
+<hr />
+<h2 id="5-unified-elasticbuffer-hybrid-kernel">5. Unified ElasticBuffer + Hybrid Kernel<a class="headerlink" href="#5-unified-elasticbuffer-hybrid-kernel" title="Permanent link">&para;</a></h2>
+<h3 id="51-warp-hybrid_dispatchcuh">5.1 warp 分工（hybrid_dispatch.cuh）<a class="headerlink" href="#51-warp-hybrid_dispatchcuh" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kNumNotifyWarps     — 归约 per-expert / per-rank token 计数并广播
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kNumScaleoutWarps   — 拷 token 到 send buffer、gin.put 到远端、gin.red_add_rel 推 tail
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>kNumForwardWarps    — poll 远端 signal、消费 token、TMA store 给本节点 scale-up peer
+</span></code></pre></div>
+<p>Non-hybrid（<code>num_scaleout_ranks == 1</code>，纯节点内 NVLink）退回简单 <code>dispatch_impl</code>，只有 notify + dispatch 两组 warp。</p>
+<h3 id="52-warp">5.2 warp 数公式<a class="headerlink" href="#52-warp" title="Permanent link">&para;</a></h3>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// combine.hpp</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">num_warps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="n">num_smem_bytes</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">token_layout_bytes</span><span class="p">,</span><span class="w"> </span><span class="mi">32</span><span class="p">);</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">num_scaleup_warps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_forward_warps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">num_channels</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">num_sms</span><span class="p">;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="c1">// dispatch.hpp</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">num_notify_smem_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">align</span><span class="p">(</span><span class="n">num_ranks</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">num_experts</span><span class="p">,</span><span class="w"> </span><span class="n">kNumNotifyWarps</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="kt">int</span><span class="p">);</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">num_dispatch_warps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">((</span><span class="n">num_smem_bytes</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">num_notify_smem_bytes</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">token_layout_bytes</span><span class="p">,</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">                         </span><span class="mi">32</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">num_notify_warps</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">                         </span><span class="n">ceil_div</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span><span class="w"> </span><span class="n">num_sms</span><span class="p">));</span>
+</span></code></pre></div>
+<p><code>ceil_div(512, num_sms)</code> 是 <strong>4× SM 缩减的源头</strong>——shared memory 和 32 warp 上限饱和后，每 SM 多塞 channel 反而更省 SM。</p>
+<hr />
+<h2 id="6-engram-pp-agrs">6. Engram / PP / AGRS 三个新原语<a class="headerlink" href="#6-engram-pp-agrs" title="Permanent link">&para;</a></h2>
+<h3 id="61-engram0-sm-sparse-gather-via-rdma">6.1 Engram（0-SM sparse gather via RDMA）<a class="headerlink" href="#61-engram0-sm-sparse-gather-via-rdma" title="Permanent link">&para;</a></h3>
+<p>名字诱导人想 "memory trace 预存"，<strong>实际是个 RDMA sparse gather</strong>。用法：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">buffer</span><span class="o">.</span><span class="n">engram_write</span><span class="p">(</span><span class="n">local_storage</span><span class="p">)</span>     <span class="c1"># 把本地 slab 注册进 window</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">hook</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">engram_fetch</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>    <span class="c1"># 按 indices 异步 gin.get</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">fetched</span> <span class="o">=</span> <span class="n">hook</span><span class="p">()</span>                       <span class="c1"># wait</span>
+</span></code></pre></div>
+<p>kernel（<code>engram_fetch.cuh</code>）：每 warp 协作发一个 <code>gin.get</code> 把一个 token 拉过来；follow-up kernel 只 <code>gin.wait()</code>。"0 SM" 是 GIN+NIC 包办搬字节，GPU 只敲 doorbell——并非字面 0 SM（还是会启一个 1024-thread kernel）。</p>
+<p><strong>适用场景</strong>：KV-cache remote read、embedding table gather、稀疏 attention——任何"按 index 拉远端 token"的模式。</p>
+<h3 id="62-pp-sendrecv-warp-kernel">6.2 PP send/recv（持久单 warp kernel）<a class="headerlink" href="#62-pp-sendrecv-warp-kernel" title="Permanent link">&para;</a></h3>
+<p><code>pp_send_recv.cuh</code>，<code>__launch_bounds__(32, 1)</code>，一个 warp 一个 CTA。</p>
+<ul>
+<li><code>pp_send_impl</code>：等接收端 slot-release signal → TMA 暂存 → <code>gin.put</code> → bump send counter</li>
+<li><code>pp_recv_impl</code>：等 arrival signal → TMA 到输出 → 回 slot-free signal → bump recv counter</li>
+</ul>
+<p>环形 slot 管理：<code>slot_idx = send_count % num_max_inflight_tensors</code>。和 dispatch/combine 共享同一 window、同一组 QP，PP 上下文不额外建 RDMA 栈。</p>
+<h3 id="63-agrscp-all-gather-reduce-scatter-via-copy-engine">6.3 AGRS（CP all-gather / reduce-scatter via Copy Engine）<a class="headerlink" href="#63-agrscp-all-gather-reduce-scatter-via-copy-engine" title="Permanent link">&para;</a></h3>
+<p>README 把它叫 "0 SM CP with Copy Engine"，代码里叫 <strong>AGRS</strong>（all-gather / reduce-scatter），<strong>走 NVLink 对称内存</strong>，<strong>不走 RDMA</strong>：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">with</span> <span class="n">buffer</span><span class="o">.</span><span class="n">agrs_new_session</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">,</span> <span class="n">max_inflight_count</span><span class="p">):</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    <span class="n">gathered</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">all_gather</span><span class="p">(</span><span class="n">local_tensor</span><span class="p">)</span>
+</span></code></pre></div>
+<p>底层调 <code>cuda_driver::batched_write</code>/<code>batched_wait</code> 直接编程 copy engine。"0 SM" 在这里是真的——DMA 引擎跑，SM 不动。跟 EP 正交，另起 session、另备 buffer，所以可以和 dispatch/combine 重叠。</p>
+<hr />
+<h2 id="7-smqp-autotuner">7. 解析 SM/QP 计算（杀掉 autotuner 的核心）<a class="headerlink" href="#7-smqp-autotuner" title="Permanent link">&para;</a></h2>
+<p>来自 <code>deep_ep/buffers/elastic.py</code> 的 <code>get_theoretical_num_sms</code>：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># 每 token 期望命中的远端 expert 数（group-limited gate）</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_expected_topk</span><span class="p">(</span><span class="n">num_groups</span><span class="p">):</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">return</span> <span class="n">num_groups</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">comb</span><span class="p">(</span><span class="n">N_exp</span> <span class="o">-</span> <span class="n">N_exp</span><span class="o">/</span><span class="n">num_groups</span><span class="p">,</span> <span class="n">num_topk</span><span class="p">)</span> <span class="o">/</span> <span class="n">comb</span><span class="p">(</span><span class="n">N_exp</span><span class="p">,</span> <span class="n">num_topk</span><span class="p">))</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1"># HBM 读写算力需求</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="n">sm_read</span>  <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">topk</span> <span class="o">+</span> <span class="n">scaleout_topk</span><span class="o">/</span><span class="n">topk</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="n">sm_write</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">topk</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">topk</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">scaleout_topk</span><span class="o">/</span><span class="n">num_scaleout</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="c1"># 线路需求</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="n">rdma_traffic</span>   <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">topk</span><span class="p">)</span> <span class="o">*</span> <span class="n">scaleout_topk</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">num_scaleout</span><span class="p">)</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="n">nvlink_traffic</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">num_scaleup</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="c1"># 用最慢那条线定 SM，HBM 带宽匹配得上即可</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="n">bounded_gbs</span><span class="p">,</span> <span class="n">bounded_traffic</span> <span class="o">=</span> <span class="n">argmax_by_time</span><span class="p">(</span><span class="n">rdma</span><span class="p">,</span> <span class="n">nvlink</span><span class="p">)</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="n">num_sms</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>    <span class="n">bounded_gbs</span><span class="o">/</span><span class="n">bounded_traffic</span> <span class="o">*</span> <span class="n">sm_read</span>  <span class="o">/</span> <span class="n">sm_read_gbs</span><span class="p">,</span>    <span class="c1"># 200 GB/s default</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>    <span class="n">bounded_gbs</span><span class="o">/</span><span class="n">bounded_traffic</span> <span class="o">*</span> <span class="n">sm_write</span> <span class="o">/</span> <span class="n">sm_write_gbs</span><span class="p">,</span>   <span class="c1"># 50  GB/s default</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="p">)</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="n">num_sms</span> <span class="o">=</span> <span class="n">align</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">ceil</span><span class="p">(</span><span class="n">num_sms</span> <span class="o">*</span> <span class="mf">1.25</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>   <span class="c1"># 25% headroom, 偶数</span>
+</span></code></pre></div>
+<p>QP 数：</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">num_qps</span> <span class="o">=</span> <span class="n">num_sms</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">+</span> <span class="mi">1</span>    <span class="k">if</span> <span class="n">allow_hybrid_mode</span> <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_sms</span><span class="p">,</span> <span class="mi">8</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">num_qps</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_qps</span><span class="p">,</span> <span class="n">num_allocated_qps</span><span class="p">)</span>     <span class="c1"># 65 或 129 (hybrid) / 17 (non-hybrid)</span>
+</span></code></pre></div>
+<p>Hybrid 下 <strong>每 SM 驱动 16 条 channel 走独立 QP</strong>，所以 context 数要 65/129。<code>+1</code> 是 barrier/flush 专用 QP。</p>
+<p>QP ↔ SM 分配（<code>common/comm.cuh</code>）：</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">kNumSMs</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">kNumAvailableQPs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="c1">// 每 SM 独享若干 QP，CTA-local 共享</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="n">kQPStartIdx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">sm_idx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">...,</span><span class="w"> </span><span class="n">kSharingCTA</span><span class="p">};</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="c1">// SM 多过 QP，取模共享，grid-level 共享</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="n">kQPStartIdx</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_channel_idx</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">kNumAvailableQPs</span><span class="p">),</span><span class="w"> </span><span class="n">kSharingGrid</span><span class="p">};</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>这一套公式替掉了 v1 的离线 autotune——是 v2 能往 EP=2048 扩的根本原因。</p>
+<hr />
+<h2 id="8-jit">8. JIT 编译系统<a class="headerlink" href="#8-jit" title="Permanent link">&para;</a></h2>
+<p><code>csrc/jit/</code> 新目录。每个 runtime class（<code>DispatchRuntime</code> / <code>CombineRuntime</code> / <code>EngramFetchRuntime</code> / <code>PPSendRuntime</code> / ...）继承 <code>jit::LaunchRuntime&lt;Args&gt;</code>，实现 <code>generate_impl()</code> 返回一段 <code>.cu</code> 源码——内容就是 <code>#include &lt;deep_ep/impls/XXX.cuh&gt;</code> + 用编译期参数模板实例化一个 kernel。</p>
+<p>cache key：</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kernel_signature = fmt::format(&quot;{}$${}$${}$${}&quot;, name, signature, flags, code)
+</span></code></pre></div>
+<p>所以<strong>改 kernel name / 编译器版本 / 编译 flag / 生成的源文本 任何一项都触发重编译</strong>。磁盘 cache + atomic rename，多进程并发安全。</p>
+<p>代价：首次调用某 config 组合会卡住做 NVCC 编译（典型几秒到十几秒），之后从缓存走。好处：每 config 的 kernel 里所有维度都是编译期常量，寄存器分配更紧。</p>
+<hr />
+<h2 id="9-barrier-with-timeout-ptx-trap">9. Barrier with Timeout + PTX trap<a class="headerlink" href="#9-barrier-with-timeout-ptx-trap" title="Permanent link">&para;</a></h2>
+<p><code>common/comm.cuh</code> 三种 barrier：</p>
+<ul>
+<li><code>nvlink_barrier_wo_local_sync</code> — 纯 NVLink + workspace atomic</li>
+<li><code>gin_barrier_wo_local_sync</code> — <code>gin.signal</code> + shadow pointer poll <strong>带超时</strong></li>
+<li><code>scaleup_barrier_wo_local_sync</code> — 视拓扑选一个</li>
+</ul>
+<p><code>gpu_barrier()</code> 分两层：SM0 做 scale-up，其余 SM 做 scale-out，grid sync 串联。<strong>超时到阈值直接 PTX <code>trap</code> 挂掉</strong>——v1 卡死的毛病从此有 fail-fast。是个实打实的容错改进。</p>
+<hr />
+<h2 id="10">10. 我的评估<a class="headerlink" href="#10" title="Permanent link">&para;</a></h2>
+<h3 id="101">10.1 真正的架构级变化<a class="headerlink" href="#101" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>NCCL GIN 取代 NVSHMEM/IBGDA 做主 RDMA 路径</strong>——部署依赖少一套 runtime，训练框架和 DeepEP 共享 NCCL 基础设施；验证了 NCCL GIN paper 里 "生态统一" 的承诺可落地。</li>
+<li><strong>Unified ElasticBuffer + hybrid 分 warp</strong>——是 4× SM 缩减的物理来源，不是包装层改动。</li>
+<li><strong>Analytical SM/QP 公式替代 autotuner</strong>——是 EP=2048 scale 的使能。</li>
+<li><strong>Per-config JIT</strong>——每次调用编译期常量化所有维度，寄存器和 shmem 布局最优化；代价是首次编译延迟。</li>
+<li><strong>AGRS with Copy Engine</strong>——CP all-gather 走 copy engine 而不是 RDMA，这是全新的通信路径（不是改写旧路径）。</li>
+</ol>
+<h3 id="102">10.2 增量改良（没那么颠覆）<a class="headerlink" href="#102" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Engram</strong> = <code>gin.get</code> + batcher + <code>wait()</code>，名字浪漫，实现小巧。价值在于复用 GIN 管道给用户一个稀疏 gather 原语。</li>
+<li><strong>PP send/recv</strong> = 持久单 warp kernel，复用 dispatch/combine 的 window + QP，省了一套独立 RDMA 栈。</li>
+<li><strong>Barrier with timeout+trap</strong> = 生产级容错补丁，不是新机制。</li>
+</ol>
+<h3 id="103">10.3 使用者要注意的坑<a class="headerlink" href="#103" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>NCCL ≥ 2.30.4</strong> 刚发出来不久，供应链风险：NCCL 版本锁得很死；一旦自家训练栈被钉在老版本，v2 用不了。</li>
+<li>"reuse existing NCCL communicator" 目前<strong>只能从 unique_id 派生</strong>，想和 PG 的 <code>ncclComm_t</code> 真共享得自己改 shim——还没达到 paper 里宣传的"直接挂训练框架 comm"的理想形态。</li>
+<li><strong>Buffer 占用显著增大</strong>：hybrid 的 4D <code>dst_buffer_slot_idx { channel × scaleout_rank × max_tokens_per_channel × topk }</code> + scale-up 收发 + scale-out 收发，EP=2048 时不可忽略——README 自己承认。</li>
+<li><strong>0-SM 有水分</strong>：Engram/PP 都还是小 kernel（1024 thread 或 1 persistent warp），只有 AGRS 是字面 0 SM。</li>
+<li><strong>0-SM RDMA LL EP 被砍</strong>：v1 有、v2 没，decode-only 推理部署若依赖这条要再评估。</li>
+</ul>
+<h3 id="104">10.4 对我工作的启示<a class="headerlink" href="#104" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>AFD / disagg</strong>：Engram（RDMA sparse gather）语义正对 KV 跨实例读取，比 NIXL 那套 block-level transfer 粒度更细；值得把 Engram 拆出来单用。</li>
+<li><strong>PP 共享 QP 池</strong>：给 AFD 里 Attention↔FFN 的逐层通信提供了一个参考——PP send/recv 和 dispatch/combine 用同一 window、同一组 QP，AFD 的 comm 路径也可以这么收敛。</li>
+<li><strong>AGRS copy engine 路径</strong>：CP 不走 RDMA 改走 copy engine 是个很聪明的架构选择，思路可以推广——节点内任何对称内存的大块搬运都可以绕 SM。</li>
+<li><strong>Analytical 公式 vs autotune</strong>：disagg serving 的 SM/QP 配置也值得做 analytical 化，autotune 本身在 scale 大了之后 cost 爆炸。</li>
+</ul>
+<h3 id="105-nccl-gin-paper">10.5 相对 NCCL GIN paper 的实证价值<a class="headerlink" href="#105-nccl-gin-paper" title="Permanent link">&para;</a></h3>
+<p>Paper 里是 DeepEP v1 的集成数据，描述了 "每 comm 4 context → 多开 comm" 的 workaround。DeepEP v2 直接跳过这个 workaround，说明 <strong>NCCL 2.30 的 GIN 已经放开 context 限制</strong>（paper 对应的是 2.28）。可见 GIN 仍在快速演进，paper 里列的 "当前限制" 条目在 v2 时间点已经被消化掉了两条（context 数量、对称 window 大小相关的部分）。</p>
+<hr />
+<h2 id="11">11. 代码导航<a class="headerlink" href="#11" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>关心什么</th>
+<th>去哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>README / 特性矩阵 / 性能表</td>
+<td><code>README.md</code></td>
+</tr>
+<tr>
+<td>NCCL GIN 后端</td>
+<td><code>csrc/kernels/backend/nccl.cu</code>、<code>deep_ep/include/deep_ep/common/comm.cuh</code></td>
+</tr>
+<tr>
+<td>v2 dispatch/combine 内核</td>
+<td><code>deep_ep/include/deep_ep/impls/{dispatch,combine,hybrid_dispatch,hybrid_combine}.cuh</code></td>
+</tr>
+<tr>
+<td>Engram / PP</td>
+<td><code>deep_ep/include/deep_ep/impls/{engram_fetch,pp_send_recv}.cuh</code></td>
+</tr>
+<tr>
+<td>AGRS / CP</td>
+<td><code>deep_ep/buffers/elastic.py::all_gather / agrs_*</code> + <code>csrc/kernels/backend/cuda_driver.cu</code></td>
+</tr>
+<tr>
+<td>解析 SM/QP 公式</td>
+<td><code>deep_ep/buffers/elastic.py::get_theoretical_num_{sms,qps}</code></td>
+</tr>
+<tr>
+<td>JIT 系统</td>
+<td><code>csrc/jit/</code> + 各 runtime 的 <code>generate_impl()</code></td>
+</tr>
+<tr>
+<td>Barrier</td>
+<td><code>deep_ep/include/deep_ep/impls/barrier.cuh</code> + <code>common/comm.cuh</code></td>
+</tr>
+<tr>
+<td>v1 兼容</td>
+<td><code>csrc/kernels/legacy/</code> + <code>deep_ep/buffers/legacy.py</code></td>
+</tr>
+</tbody>
+</table>
+<p>相关笔记：<a href="../../communication/">通信与网络 →</a> · <a href="../../moe/">MoE Systems →</a> · <a href="../../papers/2026/04/23/2026-04-23-nccl-gin/">NCCL GIN paper →</a></p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/liz-badada" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.footer", "toc.follow", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../assets/extra.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
