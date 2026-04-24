@@ -11,10 +11,12 @@ Dated reading notes. Each note carries frontmatter: `arxiv`, `venue`, `tags`, `c
 
 | Date | Title | Category | Tags | Tier |
 |---|---|---|---|---|
-| 2026-04-23 | [GPU-Initiated Networking for NCCL (NCCL GIN)](posts/2026-04-23-nccl-gin.md) | `communication` | nccl · gin · rdma · moe · deepep | L3 |
-| 2026-04-20 | [AFD Challenges for Modern MoE Models and Hardware](posts/2026-04-20-afd-challenges.md) | `parallelism` | afd · moe · roofline | L4 |
-| 2026-04-09 | [Theoretically Optimal Attention/FFN Ratios in Disaggregated LLM Serving](posts/2026-04-09-afd-optimal-ratio.md) | `parallelism` | afd · perf-modeling | L4 |
-| 2026-04-09 | [Frontier: Simulating the Next Generation of LLM Inference Systems](posts/2026-04-09-frontier-simulator.md) | `perf-modeling` | simulation · moe · disagg | L3 |
+| 2026-04-24 | [DeepSeek-V4 基础设施拆解：6144 FLOPs/Byte 是怎么来的？](posts/2026-04-24-deepseek-v4-infra.md) | `large-scale` | deepseek · infra · ep-overlap · tilelang · fp4-qat · rl-infra · sandbox | L3 |
+| 2026-04-24 | [DeepSeek-V4：MLA 彻底不用了？](posts/2026-04-24-deepseek-v4.md) | `moe` | deepseek · moe · hybrid-attention · fp4 · muon · mhc | L3 |
+| 2026-04-23 | [NCCL GIN：把 device-initiated RDMA 带回 NCCL 生态](posts/2026-04-23-nccl-gin.md) | `communication` | nccl · gin · rdma · moe · deepep | L3 |
+| 2026-04-20 | [AFD 真的通用吗？标准集群 + 细粒度 MoE 下的 dead zone](posts/2026-04-20-afd-challenges.md) | `parallelism` | afd · moe · roofline | L4 |
+| 2026-04-09 | [AFD 的 r* 最优配比有闭式解吗？](posts/2026-04-09-afd-optimal-ratio.md) | `parallelism` | afd · perf-modeling | L4 |
+| 2026-04-09 | [Frontier：为什么现有仿真器撑不起分离式推理？](posts/2026-04-09-frontier-simulator.md) | `perf-modeling` | simulation · moe · disagg | L3 |
 
 > Full archive (paginated, auto-sorted by date) is in the **Archive** link in the right sidebar. **Categories** (also in the sidebar) filters by the 19 topic categories.
 

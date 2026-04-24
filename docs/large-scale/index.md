@@ -44,6 +44,7 @@ tags: [large-scale, distributed, fault-tolerance]
 - **LLaMA-3 training paper** (Meta, 2024) — 16k H100s, failure log.
 - **GPT-4 / Gemini / Claude** infrastructure write-ups (sparse but useful).
 - **MegaScale** (ByteDance, NSDI 2024).
+- **DeepSeek-V4 infra** (2026-04-24) — wave-scheduled EP overlap (MegaMoE, `C/B ≤ 2d = 6144 FLOPs/Byte`), TileLang DSL, batch-invariant/deterministic kernels, FP4 QAT with lossless FP4→FP8 dequant, Hybrid ZeRO for Muon, Contextual Parallelism for 1M ctx, heterogeneous KV cache + on-disk storage (3FS), token-granular WAL for preemptible RL rollout, DSec sandbox (Firecracker/QEMU + EROFS). See [DeepSeek-V4 基础设施拆解](../papers/posts/2026-04-24-deepseek-v4-infra.md).
 
 ## Canonical references
 

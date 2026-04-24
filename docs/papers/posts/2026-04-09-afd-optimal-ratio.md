@@ -11,303 +11,197 @@ status: read
 
 <!-- more -->
 
-# Theoretically Optimal Attention/FFN Ratios in Disaggregated LLM Serving
+# AFD 的 r* 最优配比有闭式解吗？
 
-> arXiv:2601.21351  
-> Chendong Song, Meixuan Wang, Hang Zhou, Hong Liang, Yuan Lyu, Zixi Chen, Yuwei Fan, Zijie Zhou
+> arXiv:2601.21351 · Chendong Song, Meixuan Wang, Hang Zhou, Hong Liang, Yuan Lyu, Zixi Chen, Yuwei Fan, Zijie Zhou
 
----
+## TL;DR {: .tldr-heading }
 
-## 1. 问题定义
+AFD（Attention-FFN Disaggregation）把 Transformer 层拆成 Attention 池和 FFN 池，用 rA-1F 拓扑连接——r 个 Attention 实例共享 1 个 FFN 实例。现有系统靠经验搜索去调 r，没有理论框架。
 
-**AFD (Attention-FFN Disaggregation)** 是一种新兴的 LLM 解码架构，将 Transformer 层拆分为：
+难点是 **Attention 的工作负载非平稳**：KV cache 按步累积，Decode 负载随解码步数指数式饱和，理想的 microbatch pipeline 平衡被打破。本文给出一个概率负载模型，借几何分布的无记忆性把时变 token 负载用单一稳态值 `T̄` 近似，然后用线性 roofline 延迟模型推出**闭式 r\* 最优解**：
 
-- **Attention 端**：有状态、内存受限（KV cache 读取主导）
-- **FFN 端**：无状态、计算密集（大批量下可达 compute-bound）
+$$r^* = \max\left\{\frac{\alpha_A \bar{T} + \beta_A - \beta_F}{\alpha_F B},\ \frac{\bar{t}_C - \beta_F}{\alpha_F B},\ \sqrt{\frac{\beta_F}{\alpha_F B}}\right\}$$
 
-二者通过 **rA-1F 拓扑** 连接——r 个 Attention 实例共享 1 个 FFN 实例，每步解码需要跨实例通信。
+三项分别对应 Attention 瓶颈、通信瓶颈、FFN 瓶颈三种运行区间。仿真下理论预测的 r\* ≈ 9.3，实测峰值在 r ∈ {8, 9}，**相对误差 < 10%**。大 r 时实测略低于理论（约 15%）是 Attention 实例间 straggler 效应。
 
-### 核心挑战：r* 最优配比问题
+自然的问题：这个闭式解在真实系统下还成立吗？Decode 分布非几何（trace 显示有尾）时精度掉多少？
 
-- **r 太小** → FFN 饥饿（缺乏输入），算力浪费
-- **r 太大** → Attention 排队阻塞等待 FFN，idle time 上升
-- 现有系统完全依赖 **经验搜索**，缺乏理论框架
+## AFD 和 r* 配比问题
 
-### 难点：Attention 工作负载的非平稳性
+AFD 把 Transformer decoder 按模块切两半：
 
-每步解码中：
-- **Prefill 负载 Pₖ**：常数（新请求的 prompt 长度），E[Pₖ] = B·μ_P
-- **Decode 负载 Dₖ**：持续增长（KV cache 累积），E[Dₖ₊₁] = (1−p)(E[Dₖ]+B)
-  - 初始 D₀ = 0
-  - 饱和值 B·(1−p)/p = B·μ_D
-- **总 token 负载 T = P + D** 随步数单调增长，打破理想的 microbatch pipeline 平衡
+- **Attention 池**：有状态，memory-bound（KV cache 读取主导）
+- **FFN 池**：无状态，compute-bound（大批量可达 compute 峰值）
 
----
+两侧通过 **rA-1F 拓扑**连接：r 个 Attention 实例共享 1 个 FFN 实例，每步解码跨实例通信。r 决定两端的平衡：
 
-## 2. 系统模型
+- r 太小 → FFN 饥饿，算力浪费
+- r 太大 → Attention 排队等 FFN，idle 上升
 
-### 2.1 四阶段同步流水线（每步解码）
+现有工业系统全靠 workload-specific 的经验搜索，没有理论指导。
+
+## 四阶段流水线与延迟模型
+
+每步解码是一个同步四阶段流水：
 
 ```
-Attention (r 个并行) → A→F 通信 → FFN (聚合 rB) → F→A 通信 → 下一步
+Attention (r 个并行) → A→F 通信 → FFN (聚合 rB 请求) → F→A 通信 → 下一步
 ```
 
-1. r 个 Attention worker 各处理 microbatch B 个请求
-2. 所有 Attention 将中间激活传给 FFN
-3. FFN 处理聚合批次 rB 个激活
-4. FFN 将结果返回给 r 个 Attention worker
+延迟模型用线性 roofline（每个阶段 = 斜率 × 负载 + 固定开销）：
 
-### 2.2 延迟模型（线性，基于 Roofline 模型）
+| 组件 | 延迟 | 瓶颈 |
+|---|---|---|
+| Attention | `t_A(T) = α_A · T + β_A` | memory-bound |
+| FFN | `t_F(rB) = α_F · (rB) + β_F` | compute-bound |
+| Communication | `t_C(B) = α_C · B + β_C` | 带宽受限 |
 
-| 组件 | 延迟公式 | 瓶颈类型 |
-|------|----------|----------|
-| Attention | t_A(T) = α_A · T + β_A | 内存受限 (memory-bound) |
-| FFN | t_F(rB) = α_F · (rB) + β_F | 计算受限 (compute-bound) |
-| Communication | t_C(B) = α_C · B + β_C | 带宽受限 |
-
-其中 α 为斜率系数，β 为固定开销。
-
-### 2.3 周期时间
+周期时间取最慢组件：
 
 $$\tau(B; r) = \max\{t_A(T),\ t_C(B),\ t_F(rB)\}$$
 
-每步的 cycle time 由最慢组件决定。
+理想条件下通信延迟可被计算重叠掩盖。但 KV cache 单调增长导致 Attention 延迟逐步增大、FFN 延迟固定，产生 **pipeline bubble**。
 
-### 2.4 Microbatch Pipelining
+## 非平稳 Attention 负载怎么分析？
 
-理想条件下通信延迟被计算重叠掩盖。但 KV cache 增长导致 Attention 延迟逐步增大而 FFN/通信固定，产生 **pipeline bubble**（Figure 2）。
+关键简化来自一个假设：**每个请求 Decode 长度服从几何分布 Geo(p)**，`p` 是每步终止概率。几何分布的无记忆性让 Markov 分析可行——`X_b(k) ~ Bernoulli(1-p)` 独立于 `i_b(k)`。
 
----
+每个 slot `b` 在第 `k` 步有两个量：
 
-## 3. 概率负载模型
+- `s_b(k)` = 当前请求的 prefill 长度
+- `i_b(k)` = 当前请求已生成的 decode token 数
 
-### 3.1 请求长度分布
+状态更新：
 
-- **Prefill 长度 P**：有界分布，均值 μ_P；具体分布形式不影响分析
-- **Decode 长度 D ~ Geo(p)**：几何分布，p = 每步终止概率，均值 μ_D = (1−p)/p
-  - 几何分布的 **无记忆性**：X_b(k) ~ Bernoulli(1−p) 独立于 i_b(k)，使 Markov 分析可行
+$$i_b(k+1) = X_b(k) \cdot (i_b(k) + 1)$$
+$$s_b(k+1) = X_b(k) \cdot s_b(k) + (1 - X_b(k)) \cdot S'_b(k)$$
 
-### 3.2 Continuous Batching
+继续（X=1）时 decode 计数 +1；终止（X=0）时从新请求采样新长度。对这两个递推取期望，可得（Lemma 4.1）：
 
-请求完成后立即从队列补充新请求，保持每个 Attention 实例恒定 batch size B。
+$$\mathbb{E}[P_k] = B \mu_P \quad\text{（恒定）}$$
 
-### 3.3 关键随机变量
+$$\mathbb{E}[D_k] = B \cdot \frac{1-p}{p} \cdot (1 - (1-p)^k)$$
 
-| 符号 | 含义 |
-|------|------|
-| X_b(k) ~ Bernoulli(1−p) | slot b 在第 k 步是否继续 |
-| s_b(k) | slot b 当前请求的 prefill 长度 |
-| i_b(k) | slot b 当前请求已生成的 decode token 数 |
-| D_k = Σ_b i_b(k) | 第 k 步聚合 decode 负载 |
-| P_k = Σ_b s_b(k) | 第 k 步聚合 prefill 负载 |
-| T_k = P_k + D_k | 第 k 步总 token 负载 |
+Decode 期望负载从零指数饱和到 `B(1-p)/p = B μ_D`。
 
-### 3.4 状态更新方程
+## 稳态 token 负载 T̄
 
-$$i_b(k+1) = X_b(k) \cdot (i_b(k) + 1) \quad \text{(Eq. 7)}$$
+把 Lemma 4.1 代入 horizon-average 求和并取 `N → ∞` 极限（Prop. 4.3）：
 
-- 若继续 (X=1)：decode index +1
-- 若终止 (X=0)：重置为 0
+$$\bar{T} = \left(\mu_P + \frac{1-p}{p}\right) \cdot B$$
 
-$$s_b(k+1) = X_b(k) \cdot s_b(k) + (1 - X_b(k)) \cdot S'_b(k) \quad \text{(Eq. 8)}$$
+这个简单公式是整个理论的支点：**时变 token 负载用单一稳态值 T̄ 近似**。剩下的分析就是对 `τ` 做 max 分解。
 
-- 若继续：保持原 prefill 长度
-- 若终止：从新请求重新采样 S'_b(k)
+## 三区间分析与闭式 r*
 
----
+定义 `M(B) := max{t̄_A, t̄_C}`（非 FFN 主导延迟）。系统按 r 大小分三个区间。
 
-## 4. 理论推导
+**Regime I：Attention 瓶颈**（`r ≤ r_A`）。Cycle time 锁定在 `t̄_A`，吞吐 per instance = `(B/t̄_A) · r/(r+1)` 随 r 递增。最优在边界 `r_A`：
 
-### Lemma 4.1（期望 Token 负载）
+$$r_A = \frac{\alpha_A \bar{T} + \beta_A - \beta_F}{\alpha_F B}$$
 
-$$\mathbb{E}[P_k] = B \mu_P, \quad \forall k \geq 0$$
+**Regime II：Communication 瓶颈**（`r ≤ r_C`）。同理 `r_C = (\bar{t}_C - \beta_F) / (α_F B)`。
 
-Prefill 期望负载恒定。
+**Regime III：FFN 瓶颈**（`r ≥ r_crit`）。每实例吞吐：
 
-$$\mathbb{E}[D_k] = B \cdot \frac{1-p}{p} \cdot \left(1 - (1-p)^k\right), \quad \forall k \geq 0$$
+$$f(r) = \frac{rB}{(r+1)(α_F r B + β_F)}$$
 
-Decode 期望负载从零出发，以指数形式趋近饱和值 B·μ_D。
+单峰，求导令 `f'(r) = 0` 得无约束极值：
 
-**证明思路**：
-- Prefill：对 Eq.8 取期望，E[S'_b(k)] = μ_P，得到不动点 Bμ_P
-- Decode：对 Eq.7 取期望，E[D_{k+1}|D_k] = (1−p)(D_k + B)，解线性递推
+$$r_{\text{peak}} = \sqrt{\frac{β_F}{α_F B}}$$
 
-### Definition 4.2（Horizon-Average Token 负载）
+约束下最优 `r^*_{III} = \max\{r_{\text{crit}}, r_{\text{peak}}\}`。
 
-$$\bar{T}(B; N) := \frac{1}{K(B)} \sum_{k=0}^{K(B)-1} \mathbb{E}[T_k]$$
+**主定理**把三个区间合起来：
 
-其中 K(B) = N/(Bp) 是服务 N 个请求所需的期望解码步数。
+$$r^* = \max\{r_A,\ r_C,\ r_{\text{peak}}\}$$
 
-### Proposition 4.3（大数定律极限）
+三项的物理含义：
 
-$$\bar{T} = \lim_{N \to \infty} \bar{T}(B; N) = \left(\mu_P + \frac{1-p}{p}\right) \cdot B \quad \text{(Eq. 14)}$$
+| 项 | 物理含义 |
+|---|---|
+| `r_A` | Attention-FFN 平衡点，低于它 FFN 算力被浪费 |
+| `r_C` | 通信约束，实际中通常不是主导 |
+| `r_peak` | FFN 瓶颈区的吞吐峰值（聚合收益 vs. 拥塞 tradeoff） |
 
-**证明**：将 Lemma 4.1 代入求和公式，对几何级数求和取极限。
+实用计算只要三步：算 `T̄ ≈ B(μ_P + μ_D)`；算三个候选；取最大。
 
-**物理意义**：将时变 token 负载用单一稳态值 T̄ 近似，是整个理论的关键简化。
+## 仿真验证
 
----
+**仿真器**是一个 6 状态有限状态机的离散事件模拟器，两个 batch 并发跑实现计算重叠，FCFS 连续批处理。
 
-## 5. 三区间分析与最优 A/F 比
-
-定义 M(B) := max{t̄_A, t̄_C}（非 FFN 主导延迟）。
-
-### Regime I：Attention 瓶颈 (t̄_A ≥ t̄_C, t̄_A ≥ t̄_F(r))
-
-- 条件：r ≤ r_A，其中
-
-$$r_A := \frac{\bar{t}_A - \beta_F}{\alpha_F B} = \frac{\alpha_A \bar{T} + \beta_A - \beta_F}{\alpha_F B} \quad \text{(Eq. 15)}$$
-
-- Cycle time 锁定在 t̄_A
-- 吞吐 per instance = (B/t̄_A) · r/(r+1)，随 r 严格递增
-- 最优：r*_I = r_A（边界处取得）
-
-### Regime II：Communication 瓶颈 (t̄_C ≥ t̄_A, t̄_C ≥ t̄_F(r))
-
-- 条件：r ≤ r_C，其中
-
-$$r_C := \frac{\bar{t}_C - \beta_F}{\alpha_F B} \quad \text{(Eq. 16)}$$
-
-- 同理最优：r*_II = r_C
-
-### Regime III：FFN 瓶颈 (t̄_F(r) ≥ M(B))
-
-- 条件：r ≥ r_crit，其中
-
-$$r_{crit} := \frac{M(B) - \beta_F}{\alpha_F B} \quad \text{(Eq. 17)}$$
-
-- 每实例吞吐函数：
-
-$$f(r) = \frac{rB}{(r+1)(\alpha_F r B + \beta_F)}$$
-
-- 对 r 求导令 f'(r)=0，无约束极值点：
-
-$$r_{peak} = \sqrt{\frac{\beta_F}{\alpha_F B}} \quad \text{(Eq. 18)}$$
-
-- f(r) 单峰：r < r_peak 递增，r > r_peak 递减
-- 约束最优：r*_III = max{r_crit, r_peak}
-
----
-
-## 6. 主定理：闭式最优 A/F 比
-
-### Theorem 4.4
-
-$$r^* = \max\left\{\frac{\alpha_A \bar{T} + \beta_A - \beta_F}{\alpha_F B},\quad \frac{\bar{t}_C - \beta_F}{\alpha_F B},\quad \sqrt{\frac{\beta_F}{\alpha_F B}}\right\} \quad \text{(Eq. 19)}$$
-
-最优吞吐：
-
-$$\text{Throughput}^* = \frac{r^* B}{(r^*+1)(\alpha_F r^* B + \beta_F)} \quad \text{(Eq. 20)}$$
-
-### 三项的物理解释
-
-| 项 | 含义 | 场景 |
-|----|------|------|
-| r_A | Attention-FFN 平衡点 | 低于此值浪费 FFN 算力 |
-| r_C | 通信约束 | 实际中通常不是主导 |
-| r_peak | FFN 瓶颈区吞吐峰值 | 聚合收益 vs. 拥塞的 tradeoff |
-
-### 实用计算步骤
-
-1. 计算 T̄ ≈ B(μ_P + μ_D)
-2. 分别计算三个候选比值 r_A, r_C, r_peak
-3. 取 r* = max{r_A, r_C, r_peak}
-
----
-
-## 7. 实验验证
-
-### 7.1 仿真器设置
-
-- **离散事件仿真器**，6 状态有限状态机：
-  ```
-  Attention → A2F transfer → Waiting → FFN → F2A transfer → Waiting → repeat
-  ```
-- 两个 batch 同时运行实现计算重叠
-- 连续批处理 (FCFS)：空位立即从缓冲区补充
-
-### 7.2 模型与硬件配置
+**配置**（Huawei Ascend 910C NPU, DeepSeek-V3）：
 
 | 参数 | 值 |
-|------|-----|
-| 模型 | DeepSeek-V3 |
-| Hidden size H | 7168 |
-| KV cache 维度 (d_c + d_rope) | 576 |
+|---|---|
+| Hidden H | 7168 |
+| KV cache dim (d_c + d_rope) | 576 |
 | Expert 中间维度 | 2048 |
-| Expert 总数 | 256 |
-| 每 token 路由 expert 数 | k = 8 |
-| 硬件 | Huawei Ascend 910C NPU |
+| Expert 总数 / Top-K | 256 / 8 |
 | 基准 batch size B | 256 |
 | 基准 decode 长度 μ_D | 500 |
 | 基准 prefill 长度 μ_P | 100 |
-| 仿真规模 N | 10,000 requests/Attention instance |
-| 扫描范围 | r ∈ {1, 2, 4, 8, 16, 24, 32} |
+| 仿真规模 N | 10,000 请求/实例 |
+| r 扫描 | {1, 2, 4, 8, 16, 24, 32} |
 
-### 7.3 延迟系数（Table 2，线性回归拟合执行 trace）
+延迟系数（线性回归拟合 trace）：`α_A = 0.00165, β_A = 50, α_F = 0.083, β_F = 100, α_C = 0.022, β_C = 20`（单位按论文）。
 
-| 参数 | 值 |
-|------|-----|
-| α_A | 0.00165 cycles/token |
-| β_A | 50 cycles |
-| α_F | 0.083 cycles/request |
-| β_F | 100 cycles |
-| α_C | 0.022 cycles/token |
-| β_C | 20 cycles |
+**主要结果**：理论预测 `r*_theory ≈ 9.3`，仿真最优在 `r ∈ {8, 9}`，相对误差 < 10%。
 
-### 7.4 主要结果
+Idle 比率随 r 变化：
 
-**理论 vs. 仿真最优（Figure 4）**：
-- 理论预测 r*_theory ≈ 9.3
-- 仿真最优在 r ≈ 8–9 处取得峰值
-- **相对误差在 10% 以内**
+| r | FFN idle | Attention idle |
+|---|---|---|
+| 1 | > 60% | ≈ 10% |
+| 8 | 交叉点（均衡） | 交叉点 |
+| 32 | 接近饱和 | > 60% |
 
-**Idle 比率分析（Figure 5）**：
+r = 32 时仿真吞吐比理论低约 15%，来源是**异构 Attention 实例间的 straggler 效应**。
 
-| r | FFN idle (η_F) | Attention idle (η_A) |
-|---|----------------|---------------------|
-| 1 | >60% | ≈10% |
-| 8 | ≈η_A（交叉点，均衡配置） | ≈η_F |
-| 32 | 接近饱和 | >60% |
+**Batch size 消融**：
 
-**大 r 时系统性偏差**：r=32 时仿真吞吐低于理论约 **15%**，原因是异构 Attention 实例间的 straggler 效应。
+| B | r* |
+|---|---|
+| 128 | 7.08 |
+| 256 | 9.34 |
+| 512 | 10.31 |
 
-### 7.5 消融实验
+B 越大 → 摊薄固定开销 → r* 温和增长。
 
-**Batch Size 影响（Figure 6）**：
+**Workload 分布消融**（r* 随总上下文长度线性缩放）：
 
-| B | r* | 趋势 |
-|---|-----|------|
-| 128 | 7.08 | |
-| 256 | 9.34 | |
-| 512 | 10.31 | |
+| (μ_P, μ_D) | r* |
+|---|---|
+| (100, 100) | 2.17 |
+| (100, 500) | 9.30 |
+| (500, 500) | 17.25 |
 
-结论：更大 batch size 摊薄固定开销、提高峰值吞吐，r* 随 B 温和增长。
+## 关键假设
 
-**Workload 分布影响（Figure 7）**：
+这套闭式解漂亮，但依赖五条假设。写下来以后用的时候知道什么时候会失效：
 
-| 配置 | r* |
-|------|-----|
-| μ_P=100, μ_D=100 | 2.17 |
-| μ_P=100, μ_D=500 | 9.30 |
-| μ_P=500, μ_D=500 | 17.25 |
+- **线性延迟模型**——Attention 和 token 数、FFN 和 batch size、通信和数据量都是线性关系。非线性区（例如 kernel tile quantization）不成立。
+- **Horizon 平均**——用 `N → ∞` 稳态值 `T̄` 替代时变负载。短 session 下 Decode 还没饱和时偏差会大。
+- **几何 decode 分布**——论文已用生产 trace 验证；但长尾 workload（比如 reasoning model）可能偏离几何。
+- **完美 continuous batching**——slot 一释放立即补，未考虑队列饥饿。
+- **负载均衡**——r 个 Attention 实例间 token 均衡；大 r 时 straggler 导致 ~15% gap。
 
-结论：r* 随总上下文长度线性缩放；更长上下文降低峰值吞吐。
+## AFD Optimal Ratio 小结
 
----
+- 用几何分布的无记忆性 + 线性 roofline 可以把非平稳 AFD 问题化简成闭式 max 分解
+- r* 的三个候选（Attention 平衡点、通信约束、FFN 峰值）都有直观物理含义
+- 10% 的理论-实测 gap 说明在合理的仿真精度下这个公式是可用的工程工具
+- 大 r straggler 是下一步值得攻的方向
 
-## 8. 关键假设与简化
+后续有真实系统验证或者非几何分布的扩展再回来更新。
 
-1. **线性延迟模型**：Attention ∝ token 数，FFN ∝ batch size，Communication ∝ 数据量
-2. **Horizon 平均**：用 N→∞ 极限下的稳态值 T̄ 替代时变 token 负载
-3. **几何 decode 分布**：无记忆性使闭式分析可行；已通过生产 trace 验证（Figure 3）
-4. **Continuous batching**：假设完美的 slot 补充，未考虑队列饥饿
-5. **负载均衡**：假设 r 个 Attention 实例间 token 负载均衡；大 r 时 straggler 效应导致约 15% gap
+## 相关链接
 
----
+- [arXiv:2601.21351](https://arxiv.org/abs/2601.21351)
 
-## 9. 结论与未来工作
+KB 内：
 
-- 建立了严格的概率框架，尽管 Attention 负载非平稳仍能准确建模 AFD 动态
-- 闭式最优 A/F 比公式在多种配置下有效
-- 仿真验证理论预测在 ~10% 相对误差内
-- **未来工作**：真实系统验证（待 AFD 实现成熟后）、负载均衡策略缓解大 r 时的 straggler gap
+- [AFD Challenges（硬件-模型组合下的 dead zone）](2026-04-20-afd-challenges.md)
+- [Frontier 仿真器](2026-04-09-frontier-simulator.md)
+- [Parallelism →](../../parallelism/index.md)

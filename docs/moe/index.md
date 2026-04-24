@@ -36,11 +36,16 @@ Mixture-of-Experts. Sparse activation is easy on paper, painful on silicon.
 - Expert-parallel gradient sync.
 - Upcycling from dense (Qwen1.5-MoE approach).
 
+## Recent notes
+
+- **DeepSeek-V4** (2026-04-24) — MLA dropped; Hybrid Attention = CSA (sequence-dim compression + DSA) + HCA (heavier compression, dense); Shared-KV MQA; mHC residuals; Muon optimizer; FP4+FP8 mixed training; 1M native context; KV cache ≈10% of V3.2. See [DeepSeek-V4：MLA 彻底不用了？](../papers/posts/2026-04-24-deepseek-v4.md).
+
 ## Canonical references
 
 - *GShard* (Lepikhin et al., 2020)
 - *Switch Transformer* (Fedus et al., 2021)
 - *Expert Choice Routing* (Zhou et al., 2022)
 - *DeepSeek-V2 / V3* — auxiliary-loss-free MoE
+- *DeepSeek-V4* — Hybrid CSA+HCA attention, mHC, Muon, FP4 training
 - *DeepEP* — comm kernels
 - *Mixtral of Experts* (Jiang et al., 2024)
